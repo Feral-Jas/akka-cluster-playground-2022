@@ -10,7 +10,7 @@ object ClusterScheduler {
   case object ReloadVaultTask extends Task
 
   def apply(distributedConfig: ActorRef[DistributedConfig.Command]) = {
-    Behaviors.receiveMessage {
+    Behaviors.receiveMessage[Task] {
       case ReloadConfigTask =>
         //load from  db
         distributedConfig ! DistributedConfig.AddConfig(

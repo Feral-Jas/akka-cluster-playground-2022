@@ -1,17 +1,24 @@
 package sample.gdmexchange
 
+import akka.actor.testkit.typed.scaladsl.TestProbe
 import akka.actor.typed.scaladsl.adapter.ClassicActorSystemOps
 import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.cluster.ddata.Replicator
+import akka.cluster.ddata.typed.scaladsl.DistributedData
+import akka.cluster.ddata.typed.scaladsl.Replicator.{GetReplicaCount, ReplicaCount}
 import akka.cluster.typed.{Cluster, Join}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
 import com.typesafe.config.ConfigFactory
-import sample.distributeddata.{STMultiNodeSpec, ShoppingCartSpec}
+import sample.distributeddata.STMultiNodeSpec
+import sample.gdmexchange.DistributedConfigSpec.{clusterNode1, clusterNode2, clusterNode3}
+
+import scala.concurrent.duration.DurationInt
 
 object DistributedConfigSpec extends MultiNodeConfig {
-  val node1 = role("node-1")
-  val node2 = role("node-2")
-  val node3 = role("node-3")
+  val clusterNode1 = role("node-1")
+  val clusterNode2 = role("node-2")
+  val clusterNode3 = role("node-3")
 
   commonConfig(ConfigFactory.parseString("""
     akka.loglevel = INFO
@@ -24,12 +31,12 @@ object DistributedConfigSpec extends MultiNodeConfig {
 
 }
 
-//class ReplicatedCacheSpecMultiJvmNode1 extends DistributedConfigSpec
-//class ReplicatedCacheSpecMultiJvmNode2 extends DistributedConfigSpec
-//class ReplicatedCacheSpecMultiJvmNode3 extends DistributedConfigSpec
+class ReplicatedCacheSpecMultiJvmNode1 extends DistributedConfigSpec
+class ReplicatedCacheSpecMultiJvmNode2 extends DistributedConfigSpec
+class ReplicatedCacheSpecMultiJvmNode3 extends DistributedConfigSpec
 
 class DistributedConfigSpec
-    extends MultiNodeSpec(ShoppingCartSpec) with STMultiNodeSpec {
+    extends MultiNodeSpec(DistributedConfigSpec) with STMultiNodeSpec {
   override def initialParticipants: Int = roles.size
   implicit val typedSystem: ActorSystem[Nothing] = system.toTyped
   val cluster = Cluster(typedSystem)
@@ -47,9 +54,9 @@ class DistributedConfigSpec
 
   "Demo of a replicated shopping cart" must {
     "join cluster" in within(20.seconds) {
-      join(node1, node1)
-      join(node2, node1)
-      join(node3, node1)
+      join(clusterNode1, clusterNode1)
+      join(clusterNode2, clusterNode1)
+      join(clusterNode3, clusterNode1)
 
       awaitAssert {
         val probe = TestProbe[ReplicaCount]()
@@ -58,4 +65,5 @@ class DistributedConfigSpec
       }
       enterBarrier("after-1")
     }
+  }
 }
