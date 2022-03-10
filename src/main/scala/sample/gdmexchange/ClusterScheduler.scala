@@ -2,12 +2,13 @@ package sample.gdmexchange
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
+import sample.CborSerializable
 import sample.gdmexchange.DistributedConfig.ConfigItem
 
 object ClusterScheduler {
   sealed trait Task
-  case object ReloadConfigFromDBTask extends Task
-  case object ReloadVaultTask extends Task
+  case object ReloadConfigFromDBTask extends Task with CborSerializable
+  case object ReloadVaultTask extends Task with CborSerializable
 
   def apply(distributedConfig: ActorRef[DistributedConfig.Command]) = {
     Behaviors.receiveMessage[Task] {

@@ -28,8 +28,8 @@ object DistributedConfigSpec extends MultiNodeConfig {
     akka.log-dead-letters-during-shutdown = off
     akka.actor.serialization-bindings {
       "sample.CborSerializable" = jackson-cbor
+
     }
-    akka.actor.allow-java-serialization = on
     """))
 
 }
@@ -92,7 +92,7 @@ class DistributedConfigSpec
     enterBarrier("after-2")
   }
   "Test ReloadVaultTask" in within(10.seconds) {
-    runOn(clusterNode2) {
+    runOn(clusterNode3) {
       clusterScheduler ! ClusterScheduler.ReloadVaultTask
     }
     enterBarrier("updates-done")
@@ -103,6 +103,33 @@ class DistributedConfigSpec
       val configSet = probe.expectMessageType[ConfigSet]
       val KEY_3 = configSet.items.find(_.configName == "key3")
       val KEY_4 = configSet.items.find(_.configName == "key4")
+      KEY_3 shouldBe a[Some[ConfigItem]]
+      KEY_3.get.decimalValueOpt shouldEqual Some(3)
+      KEY_4 shouldBe a[Some[ConfigItem]]
+      KEY_4.get.decimalValueOpt shouldEqual Some(4)
+    }
+
+    enterBarrier("after-3")
+  }
+  "Test ReloadVaultTask & ReloadConfigFromDBTask" in within(10.seconds) {
+    runOn(clusterNode1) {
+      clusterScheduler ! ClusterScheduler.ReloadConfigFromDBTask
+      clusterScheduler ! ClusterScheduler.ReloadVaultTask
+    }
+    enterBarrier("updates-all-done")
+
+    awaitAssert {
+      val probe = TestProbe[DistributedConfig.ConfigSet]()
+      distributedConfig ! DistributedConfig.GetAllConfig(probe.ref)
+      val configSet = probe.expectMessageType[ConfigSet]
+      val KEY_1 = configSet.items.find(_.configName == "key1")
+      val KEY_2 = configSet.items.find(_.configName == "key2")
+      val KEY_3 = configSet.items.find(_.configName == "key3")
+      val KEY_4 = configSet.items.find(_.configName == "key4")
+      KEY_1 shouldBe a[Some[ConfigItem]]
+      KEY_1.get.stringValueOpt shouldEqual Some("value1")
+      KEY_2 shouldBe a[Some[ConfigItem]]
+      KEY_2.get.stringValueOpt shouldEqual Some("value2")
       KEY_3 shouldBe a[Some[ConfigItem]]
       KEY_3.get.decimalValueOpt shouldEqual Some(3)
       KEY_4 shouldBe a[Some[ConfigItem]]
