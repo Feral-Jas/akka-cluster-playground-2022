@@ -24,7 +24,7 @@ object ShoppingCartSpec extends MultiNodeConfig {
     akka.actor.provider = "cluster"
     akka.log-dead-letters-during-shutdown = off
     akka.actor.serialization-bindings {
-      "sample.distributeddata.ShoppingCart$LineItem" = jackson-cbor
+      "sample.CborSerializable" = jackson-cbor
     }
     """))
 

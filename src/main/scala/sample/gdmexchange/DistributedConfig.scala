@@ -6,6 +6,7 @@ import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata.typed.scaladsl.DistributedData
 import akka.cluster.ddata.typed.scaladsl.Replicator.{Get, Update}
 import akka.cluster.ddata.{LWWMap, LWWMapKey, ReplicatedData, SelfUniqueAddress}
+import sample.CborSerializable
 
 import scala.concurrent.duration.DurationInt
 
@@ -16,7 +17,7 @@ object DistributedConfig {
   final case class RemoveConfig(configName: String) extends Command
 
   final case class ConfigSet(items: Set[ConfigItem])
-  final case class ConfigItem(configName: String, stringValueOpt: Option[String] = None, decimalValueOpt: Option[BigDecimal] = None)
+  final case class ConfigItem(configName: String, stringValueOpt: Option[String] = None, decimalValueOpt: Option[BigDecimal] = None)extends CborSerializable
 
   private sealed trait InternalCommand extends Command
   private case class InternalGetResponse(replyTo: ActorRef[ConfigSet], rsp: GetResponse[LWWMap[String, ConfigItem]]) extends InternalCommand

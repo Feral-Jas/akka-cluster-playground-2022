@@ -10,7 +10,8 @@ import akka.cluster.ddata.ReplicatedData
 import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata.SelfUniqueAddress
 import akka.cluster.ddata.typed.scaladsl.DistributedData
-import akka.cluster.ddata.typed.scaladsl.Replicator.{ Update, Get }
+import akka.cluster.ddata.typed.scaladsl.Replicator.{Get, Update}
+import sample.CborSerializable
 
 object ShoppingCart {
   sealed trait Command
@@ -19,7 +20,7 @@ object ShoppingCart {
   final case class RemoveItem(productId: String) extends Command
 
   final case class Cart(items: Set[LineItem])
-  final case class LineItem(productId: String, title: String, quantity: Int)
+  final case class LineItem(productId: String, title: String, quantity: Int) extends CborSerializable
 
   private sealed trait InternalCommand extends Command
   private case class InternalGetResponse(replyTo: ActorRef[Cart], rsp: GetResponse[LWWMap[String, LineItem]]) extends InternalCommand

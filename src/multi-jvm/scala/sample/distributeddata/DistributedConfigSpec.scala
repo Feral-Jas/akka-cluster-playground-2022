@@ -27,7 +27,7 @@ object DistributedConfigSpec extends MultiNodeConfig {
     akka.actor.provider = "cluster"
     akka.log-dead-letters-during-shutdown = off
     akka.actor.serialization-bindings {
-      "sample.gdmexchange.DistributedConfig$ConfigItem" = jackson-cbor
+      "sample.CborSerializable" = jackson-cbor
     }
     akka.actor.allow-java-serialization = on
     """))
