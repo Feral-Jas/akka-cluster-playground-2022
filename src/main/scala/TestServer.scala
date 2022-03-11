@@ -1,21 +1,36 @@
-import akka.actor.typed.ActorSystem
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
+import com.google.inject.Guice
 import io.gdmexchange.common.util.{AppSettings, Loggable}
+import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
+import sample.gdmexchange.ClusterScheduler.{ReloadConfigFromDBTask, ReloadVaultTask}
+import sample.gdmexchange.{ClusterScheduler, DistributedConfig, UniversalModule}
 
+import scala.concurrent.duration.DurationInt
 import scala.util.control.NonFatal
 
-/**
- * @author Chenyu.Liu
- */
-object TestServer extends Loggable{
+/** @author Chenyu.Liu
+  */
+object TestServer extends Loggable {
   def main(args: Array[String]): Unit = {
-    val name = AppSettings(args).appName
-    val system = ActorSystem[Nothing](Behaviors.empty, name)
+    val appSettings = AppSettings(args)
+    val name = appSettings.appName
+    val config = appSettings.config
+    implicit val system = ActorSystem[Nothing](
+      Behaviors.setup[Nothing] { ctx =>
+        val injector = Guice.createInjector(UniversalModule(config, ctx))
+        val dConfigActor = injector.instance[ActorRef[DistributedConfig.Command]]
+        val cScheduler = injector.instance[ActorRef[ClusterScheduler.Task]]
+
+        Behaviors.same
+      },
+      name
+    )
 
     try {
-      init(system)
+      init
     } catch {
       case NonFatal(e) =>
         logger.error("Terminating due to initialization failure.", e)
@@ -23,7 +38,7 @@ object TestServer extends Loggable{
     }
   }
 
-  def init(system: ActorSystem[_]): Unit = {
+  def init(implicit system: ActorSystem[_]): Unit = {
     AkkaManagement(system).start()
     ClusterBootstrap(system).start()
   }

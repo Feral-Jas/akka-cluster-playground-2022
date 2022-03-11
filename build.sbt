@@ -1,5 +1,5 @@
-import com.typesafe.sbt.SbtMultiJvm.multiJvmSettings
 import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
+import com.typesafe.sbt.SbtMultiJvm.multiJvmSettings
 
 val AkkaVersion = "2.6.18"
 val AkkaHttpVersion = "10.2.8"
@@ -22,9 +22,10 @@ val `akka-sample-distributed-data-scala` = project
     Compile / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
     run / javaOptions ++= Seq("-Xms128m", "-Xmx2048m"),
     libraryDependencies ++= Seq(
-      // 1. Basic dependencies for a clustered application
+      // 1. Ascendex exchange-common stuff
       "com.btmx" %% "common" % ExchangeCommonVersion,
       "com.btmx" %% "web-server-common" % ExchangeCommonVersion,
+      // 2. Basic dependencies for a clustered application
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream-typed" % AkkaVersion,
       "com.typesafe.akka" %% "akka-serialization-jackson" % AkkaVersion,
@@ -34,7 +35,7 @@ val `akka-sample-distributed-data-scala` = project
       "com.typesafe.akka" %% "akka-actor-testkit-typed" % AkkaVersion % Test,
       "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
       "com.typesafe.akka" %% "akka-multi-node-testkit" % AkkaVersion % Test,
-      // Akka Management powers Health Checks and Akka Cluster Bootstrapping
+      // 3. Akka Management powers Health Checks and Akka Cluster Bootstrapping
       "com.lightbend.akka.management" %% "akka-management" % AkkaManagementVersion,
       "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
       "com.typesafe.akka" %% "akka-http2-support" % AkkaHttpVersion,
@@ -44,12 +45,15 @@ val `akka-sample-distributed-data-scala` = project
       "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % AkkaManagementVersion,
       "com.typesafe.akka" %% "akka-discovery" % AkkaVersion,
       "ch.qos.logback" % "logback-classic" % "1.2.9" % Test,
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test
+      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+      // 4. Extra tools
+      "net.codingwell" %% "scala-guice" % "5.0.2",
+      "com.colofabrix.scala" %% "figlet4s-core" % "0.3.1"
     ),
     run / fork := true,
     Global / cancelable := false, // ctrl-c
     // disable parallel tests
-     Test/parallelExecution  := false,
+    Test / parallelExecution := false,
     // show full stack traces and test case durations
     Test / testOptions += Tests.Argument("-oDF"),
     Test / logBuffered := false,
