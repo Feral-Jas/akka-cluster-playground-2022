@@ -5,6 +5,7 @@
 1. Avoid single node failure
 2. Provide better availability
 3. Built-in management of nodes and actors
+4. ClusterSingleton Actor spawn immediately on other JVM
 
 #### How to test
 1. sbt (go to sbt shell)
