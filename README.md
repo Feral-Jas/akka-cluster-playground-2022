@@ -7,8 +7,9 @@
 3. Built-in management of nodes and actors
 
 #### How to test
-1. sbt multi-jvm:test 
-2. sbt multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
+1. sbt (go to sbt shell)
+2. multi-jvm:test 
+3. multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
 
 #### How to run
 1. define program args 
