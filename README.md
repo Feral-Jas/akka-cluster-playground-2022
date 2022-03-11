@@ -14,9 +14,9 @@
 1. define program args 
    1. -e staging -i 0/1/2
 2. define environment variable 
-   3. CANONICAL_PORT=2551/2552/2553 
-   4. MANAGE_PORT=9101/9102/9103
-   5. STAGING_CUSTOM_HOSTNAME=10.6.1.103
+   1. CANONICAL_PORT=2551/2552/2553 
+   2. MANAGE_PORT=9101/9102/9103
+   3. STAGING_CUSTOM_HOSTNAME=10.6.1.103
 3. have fun (currently there's nothing defined in cluster)
 
 #### TODOs
