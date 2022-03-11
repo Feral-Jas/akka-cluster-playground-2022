@@ -2,24 +2,33 @@ package sample.gdmexchange
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
+import io.gdmexchange.common.util.Loggable
 import sample.CborSerializable
 import sample.gdmexchange.DistributedConfig.ConfigItem
 
-object ClusterScheduler {
+import scala.concurrent.duration.DurationInt
+
+object ClusterScheduler extends Loggable {
   sealed trait Task
   case object ReloadConfigFromDBTask extends Task with CborSerializable
   case object ReloadVaultTask extends Task with CborSerializable
 
   def apply(distributedConfig: ActorRef[DistributedConfig.Command]) = {
-    Behaviors.receiveMessage[Task] {
-      case ReloadConfigFromDBTask =>
-        //load from  db
-        doReloadConfigFromDb(distributedConfig)
-        Behaviors.same
-      case ReloadVaultTask =>
-        //load from vault
-        doReloadFromVault(distributedConfig)
-        Behaviors.same
+    Behaviors.withTimers[ClusterScheduler.Task] { timer =>
+      timer.startTimerWithFixedDelay(ReloadVaultTask, 5.seconds)
+      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 5.seconds)
+      Behaviors.receiveMessage[Task] {
+        case ReloadConfigFromDBTask =>
+          //load from  db
+          logger.info("<<<< Reload config from database")
+          doReloadConfigFromDb(distributedConfig)
+          Behaviors.same
+        case ReloadVaultTask =>
+          //load from vault
+          logger.info("<<<< Reload config from vaultMgr")
+          doReloadFromVault(distributedConfig)
+          Behaviors.same
+      }
     }
   }
   def doReloadConfigFromDb(
