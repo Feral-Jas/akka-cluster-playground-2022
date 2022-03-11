@@ -1,4 +1,4 @@
-### Akka Cluster Usage
+## Akka Cluster Usage
 ![alt text](./akka-cluster-design.png)
 
 #### Design Origin
@@ -24,7 +24,7 @@
 2. provide an universal task manager among cluster
 
 ~~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo~~
-
+# Below is from Akka Distributed Data
 This tutorial contains 5 samples illustrating how to use [Akka Distributed Data](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html).
 
 - Low Latency Voting Service
