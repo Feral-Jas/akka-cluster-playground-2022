@@ -14,24 +14,33 @@ object ClusterScheduler {
     Behaviors.receiveMessage[Task] {
       case ReloadConfigFromDBTask =>
         //load from  db
-        distributedConfig ! DistributedConfig.AddConfig(
-          ConfigItem("key1", Some("value1"))
-        )
-        distributedConfig ! DistributedConfig.AddConfig(
-          ConfigItem("key2", Some("value2"))
-        )
+        doReloadConfigFromDb(distributedConfig)
         Behaviors.same
       case ReloadVaultTask =>
         //load from vault
-        distributedConfig ! DistributedConfig.AddConfig(
-          ConfigItem("key3", None, Some(3))
-        )
-        distributedConfig ! DistributedConfig.AddConfig(
-          ConfigItem("key4", None, Some(4))
-        )
+        doReloadFromVault(distributedConfig)
         Behaviors.same
     }
-
+  }
+  def doReloadConfigFromDb(
+      distributedConfig: ActorRef[DistributedConfig.Command]
+  ) = {
+    distributedConfig ! DistributedConfig.AddConfig(
+      ConfigItem("key1", Some("value1"))
+    )
+    distributedConfig ! DistributedConfig.AddConfig(
+      ConfigItem("key2", Some("value2"))
+    )
   }
 
+  def doReloadFromVault(
+      distributedConfig: ActorRef[DistributedConfig.Command]
+  ) = {
+    distributedConfig ! DistributedConfig.AddConfig(
+      ConfigItem("key3", None, Some(3))
+    )
+    distributedConfig ! DistributedConfig.AddConfig(
+      ConfigItem("key4", None, Some(4))
+    )
+  }
 }
