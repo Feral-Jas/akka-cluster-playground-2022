@@ -1,3 +1,17 @@
+### Akka Cluster Usage
+![alt text](./akka-cluster-design.png)
+
+#### Design Origin
+1. Avoid single node failure
+2. Provide better availability
+3. Built-in management of nodes and actors
+
+#### How to test
+1. sbt multi-jvm:test 
+2. sbt multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
+
+~~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo~~
+
 This tutorial contains 5 samples illustrating how to use [Akka Distributed Data](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html).
 
 - Low Latency Voting Service
