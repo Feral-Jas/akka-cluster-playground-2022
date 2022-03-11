@@ -1,11 +1,11 @@
 package sample.gdmexchange
 
-import akka.actor.typed.{ActorRef, SupervisorStrategy}
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, SupervisorStrategy}
 import akka.cluster.typed.{ClusterSingleton, SingletonActor}
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import com.typesafe.config.Config
-import io.gdmexchange.common.util.{Loggable, UuidUtil}
+import io.gdmexchange.common.util.Loggable
 import net.codingwell.scalaguice.ScalaModule
 
 case class UniversalModule(config: Config, actorContext: ActorContext[_])
@@ -22,7 +22,7 @@ case class UniversalModule(config: Config, actorContext: ActorContext[_])
   def distributedConfig: ActorRef[DistributedConfig.Command] = {
     val actorRef =
       actorContext.spawn(DistributedConfig("fp-api-server"), "ddata")
-    logger.info("++++++++[Actor]:DistributedConfig spawned")
+    logger.info("++++++++++|Actor::DistributedConfig spawned")
     actorRef
   }
 
@@ -35,7 +35,7 @@ case class UniversalModule(config: Config, actorContext: ActorContext[_])
     val actorRef: ActorRef[ClusterScheduler.Task] =
       singletonManager.init(
         SingletonActor(Behaviors.supervise(ClusterScheduler(distributedConfig)).onFailure[Exception](SupervisorStrategy.restart), "ClusterScheduler"))
-    logger.info("++++++++++[Actor]:ClusterScheduler spawned")
+    logger.info("++++++++++|Actor::ClusterScheduler spawned")
     actorRef
   }
 }
