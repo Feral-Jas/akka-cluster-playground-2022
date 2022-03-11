@@ -10,6 +10,15 @@
 1. sbt multi-jvm:test 
 2. sbt multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
 
+#### How to run
+1. "-e staging -i 0/1/2" for different instances
+2. define environment variable CANONICAL_PORT=2551/2552/2553 & MANAGE_PORT=9101/9102/9103
+3. have fun (currently there's nothing defined in cluster)
+
+#### TODOs
+1. provide an universal config manager among cluster
+2. provide an universal task manager among cluster
+
 ~~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo~~
 
 This tutorial contains 5 samples illustrating how to use [Akka Distributed Data](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html).
