@@ -23,6 +23,7 @@ val `akka-sample-distributed-data-scala` = project
     javaOptions ++= Seq(
       "-Xms128m",
       "-Xmx2048m",
+      "-XX:+UseZGC",
       // if you are using JDK17 please enable below
       "-J--add-opens=java.base/java.util.concurrent=ALL_UNNAMED"
     ),
