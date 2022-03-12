@@ -20,7 +20,12 @@ val `akka-sample-distributed-data-scala` = project
       "-Xlint"
     ),
     Compile / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
-    run / javaOptions ++= Seq("-Xms128m", "-Xmx2048m"),
+    javaOptions ++= Seq(
+      "-Xms128m",
+      "-Xmx2048m",
+//      "-J--add-opens=java.base/java.nio=ALL_UNNAMED",
+      "-J--add-opens=java.base/java.util.concurrent=ALL_UNNAMED"
+    ),
     libraryDependencies ++= Seq(
       // 1. Ascendex exchange-common stuff
       "com.btmx" %% "common" % ExchangeCommonVersion,
@@ -48,7 +53,9 @@ val `akka-sample-distributed-data-scala` = project
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       // 4. Extra tools
       "net.codingwell" %% "scala-guice" % "5.0.2",
-      "com.colofabrix.scala" %% "figlet4s-core" % "0.3.1"
+      "com.colofabrix.scala" %% "figlet4s-core" % "0.3.1",
+      "io.kamon" %% "kamon-bundle" % "2.4.7",
+      "io.kamon" %% "kamon-apm-reporter" % "2.4.7"
     ),
     run / fork := true,
     Global / cancelable := false, // ctrl-c

@@ -12,12 +12,12 @@ import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
 import com.typesafe.config.ConfigFactory
 import sample.gdmexchange.DistributedConfig.{ConfigItem, ConfigSet}
-import sample.distributeddata.DistributedConfigSpec.{clusterNode1, clusterNode2, clusterNode3}
+import sample.distributeddata.DistributedDataSpec.{clusterNode1, clusterNode2, clusterNode3}
 import sample.gdmexchange.{ClusterScheduler, DistributedConfig}
 
 import scala.concurrent.duration.DurationInt
 
-object DistributedConfigSpec extends MultiNodeConfig {
+object DistributedDataSpec extends MultiNodeConfig {
   val clusterNode1 = role("node-1")
   val clusterNode2 = role("node-2")
   val clusterNode3 = role("node-3")
@@ -34,12 +34,12 @@ object DistributedConfigSpec extends MultiNodeConfig {
 
 }
 
-class DistributedConfigSpecMultiJvmNode1 extends DistributedConfigSpec
-class DistributedConfigSpecMultiJvmNode2 extends DistributedConfigSpec
-class DistributedConfigSpecMultiJvmNode3 extends DistributedConfigSpec
+class DistributedDataSpecMultiJvmNode1 extends DistributedDataSpec
+class DistributedDataSpecMultiJvmNode2 extends DistributedDataSpec
+class DistributedDataSpecMultiJvmNode3 extends DistributedDataSpec
 
-class DistributedConfigSpec
-  extends MultiNodeSpec(DistributedConfigSpec) with STMultiNodeSpec {
+class DistributedDataSpec
+  extends MultiNodeSpec(DistributedDataSpec) with STMultiNodeSpec {
   override def initialParticipants: Int = roles.size
   implicit val typedSystem: ActorSystem[_] = system.toTyped
   val cluster = Cluster(typedSystem)
