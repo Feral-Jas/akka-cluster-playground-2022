@@ -22,10 +22,11 @@ object ClusterScheduler extends Loggable {
   case object ReloadConfigFromDBTask extends Task with CborSerializable
   case object ReloadVaultTask extends Task with CborSerializable
   case object SimpleLoggerTask extends Task with CborSerializable
+  //should be remove because AskPattern is not recommended inside an actor
+  implicit private val timeout: Timeout = 5.seconds
   def apply(
       distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]]
   )(implicit actorSystem: ActorSystem[_], ec: ExecutionContext) = {
-    implicit val timeout: Timeout = 5.seconds
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
       timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
@@ -34,6 +35,7 @@ object ClusterScheduler extends Loggable {
           //load from db
           logger.info("<<<< Reload config from database")
           doReloadConfigFromDb(distributedDataActor)
+          //remove ask later
           distributedDataActor
             .ask(
               DistributedDataActor.GetAllData[DataItemBase]

@@ -6,7 +6,7 @@
 2. Provide better availability
 3. Built-in management of nodes and actors
 
-#### How to test
+#### How to test(please use branch:cleaned)
 1. sbt multi-jvm:test 
 2. sbt multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
 
@@ -17,6 +17,7 @@
    3. CANONICAL_PORT=2551/2552/2553 
    4. MANAGE_PORT=9101/9102/9103
    5. STAGING_CUSTOM_HOSTNAME=10.6.1.103
+   6. HTTP_PORT=3000 (will be the endpoint for APIs)
 3. have fun (currently there's nothing defined in cluster)
 
 #### TODOs
