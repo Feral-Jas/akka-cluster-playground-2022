@@ -4,38 +4,22 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem, SupervisorStrategy}
 import akka.cluster.typed.{ClusterSingleton, SingletonActor}
 import akka.util.Timeout
-import com.google.inject.name.Named
 import com.google.inject.{AbstractModule, Provides, Singleton}
-import com.typesafe.config.Config
-import io.gdmexchange.common.util.{Loggable, Settings}
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import net.codingwell.scalaguice.ScalaModule
+import sample.Loggable
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationInt
 
-case class UniversalModule(settings: Settings, actorContext: ActorContext[_])
+case class UniversalModule( actorContext: ActorContext[_])
     extends AbstractModule
     with ScalaModule
     with Loggable {
   override def configure(): Unit = {
     bind[ActorContext[_]].toInstance(actorContext)
-    bind[Settings].toInstance(settings)
   }
-
-  @Provides
-  @Singleton
-  def config: Config = settings.config
-
-  @Provides
-  @Singleton
-  @Named("env")
-  def env: String = settings.env
-
-  @Provides
-  @Singleton
-  @Named("instance")
-  def instance: String = settings.instance
 
   @Provides
   @Singleton
@@ -82,12 +66,7 @@ case class UniversalModule(settings: Settings, actorContext: ActorContext[_])
 object UniversalModule {
   trait GlobalImplicits {
     implicit val injector: ScalaInjector
-    implicit val settings: Settings = injector.instance[Settings]
-    implicit val env: String = settings.env
-    implicit val instance: String = settings.instance
-    implicit val config: Config = injector.instance[Config]
-    implicit val timeout: Timeout =
-      Timeout.create(config.getDuration("global-implicits.ask-timeout"))
+    implicit val timeout: Timeout = 5.seconds
     implicit val typedSystem: ActorSystem[_] = injector.instance[ActorSystem[_]]
     implicit val executionContext: ExecutionContext =
       injector.instance[ExecutionContext]

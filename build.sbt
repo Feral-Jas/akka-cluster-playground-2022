@@ -28,8 +28,8 @@ val `akka-sample-distributed-data-scala` = project
     ),
     libraryDependencies ++= Seq(
       // 1. Ascendex exchange-common stuff
-      "com.btmx" %% "common" % ExchangeCommonVersion,
-      "com.btmx" %% "web-server-common" % ExchangeCommonVersion,
+//      "com.btmx" %% "common" % ExchangeCommonVersion,
+//      "com.btmx" %% "web-server-common" % ExchangeCommonVersion,
       // 2. Basic dependencies for a clustered application
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream-typed" % AkkaVersion,
@@ -49,7 +49,7 @@ val `akka-sample-distributed-data-scala` = project
       "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % AkkaManagementVersion,
       "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % AkkaManagementVersion,
       "com.typesafe.akka" %% "akka-discovery" % AkkaVersion,
-      "ch.qos.logback" % "logback-classic" % "1.2.9" % Test,
+      "ch.qos.logback" % "logback-classic" % "1.2.9",
       "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       // 4. Extra tools
       "net.codingwell" %% "scala-guice" % "5.0.2",

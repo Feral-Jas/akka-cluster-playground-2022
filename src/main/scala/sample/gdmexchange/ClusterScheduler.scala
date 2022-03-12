@@ -5,8 +5,7 @@ import akka.actor.typed.scaladsl.AskPattern.{Askable, schedulerFromActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
 import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
-import io.gdmexchange.common.util.Loggable
-import sample.CborSerializable
+import sample.{CborSerializable, Loggable}
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 
 import scala.concurrent.ExecutionContext

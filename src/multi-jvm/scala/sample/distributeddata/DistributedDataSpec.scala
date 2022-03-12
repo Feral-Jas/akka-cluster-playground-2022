@@ -27,6 +27,7 @@ object DistributedDataSpec extends MultiNodeConfig {
     akka.log-dead-letters-during-shutdown = off
     akka.actor.serialization-bindings {
       "sample.CborSerializable" = jackson-cbor
+      "sample.gdmexchange.datamodel.TypedDataItem" = jackson-cbor
     }
     """))
 

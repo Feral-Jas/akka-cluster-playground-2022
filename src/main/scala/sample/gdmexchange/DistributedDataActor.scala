@@ -6,7 +6,7 @@ import akka.cluster.ddata.Replicator._
 import akka.cluster.ddata.typed.scaladsl.DistributedData
 import akka.cluster.ddata.typed.scaladsl.Replicator.{Get, Update}
 import akka.cluster.ddata.{LWWMap, LWWMapKey, ReplicatedData, SelfUniqueAddress}
-import io.gdmexchange.common.util.Loggable
+import sample.Loggable
 import sample.gdmexchange.datamodel.DataItemBase
 
 import scala.concurrent.duration.DurationInt

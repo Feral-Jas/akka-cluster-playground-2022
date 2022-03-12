@@ -5,10 +5,9 @@ import akka.http.scaladsl.Http
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
 import com.google.inject.{Guice, Inject}
-import io.gdmexchange.common.util.{AppSettings, Loggable}
-import io.gdmexchange.webservercommon.route.BaseRoute
 import kamon.Kamon
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
+import sample.Loggable
 import sample.gdmexchange.UniversalModule
 
 import scala.util.control.NonFatal
@@ -18,18 +17,17 @@ import scala.util.{Failure, Success}
   */
 object TestServer extends Loggable {
   def main(args: Array[String]): Unit = {
-    val appSettings = AppSettings(args)
     Kamon.init()
     implicit val system: ActorSystem[Done] = ActorSystem(
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =
-          Guice.createInjector(UniversalModule(appSettings, ctx))
+          Guice.createInjector(UniversalModule(ctx))
         implicit val ec = ctx.executionContext
         val server = injector.instance[TestServer]
-        server.start()
+        server.start(args.last.toInt)
         Behaviors.same
       },
-      appSettings.appName
+      "fp-api-server"
     )
     try {
       init
@@ -46,19 +44,20 @@ object TestServer extends Loggable {
   }
 }
 class TestServer @Inject() (implicit val injector: ScalaInjector)
-    extends BaseRoute with Loggable
+    extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring
-  def start():Unit = {
+  def start(port:Int): Unit = {
     Http()
-      .newServerAt("0.0.0.0", config.getInt("global-implicits.http-port"))
-      .bind(apiDependencyWiring.externalApis).onComplete {
-      case Failure(exception) =>
-        throw exception
-      case Success(binding) =>
-        logger.info(
-          settings.appName + " Serving in " + binding.localAddress.toString
-        )
-    }
+      .newServerAt("0.0.0.0", port)
+      .bind(apiDependencyWiring.externalApis)
+      .onComplete {
+        case Failure(exception) =>
+          throw exception
+        case Success(binding) =>
+          logger.info(
+            " Serving in " + binding.localAddress.toString
+          )
+      }
   }
 }
