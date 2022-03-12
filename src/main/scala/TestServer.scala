@@ -22,7 +22,6 @@ object TestServer extends Loggable {
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =
           Guice.createInjector(UniversalModule(ctx))
-        implicit val ec = ctx.executionContext
         val server = injector.instance[TestServer]
         server.start(args.last.toInt)
         Behaviors.same

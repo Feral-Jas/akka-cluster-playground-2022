@@ -12,8 +12,7 @@ class ApiDependencyWiring(implicit val injector: ScalaInjector)
     extends UniversalModule.GlobalImplicits {
   private val distributedDataActor =
     injector.instance[ActorRef[DistributedDataActor.Command[DataItemBase]]]
-  private val clusterScheduler =
-    injector.instance[ActorRef[ClusterScheduler.Task]]
+  injector.instance[ActorRef[ClusterScheduler.Task]]
   val externalApis: Route = path("data") {
     val dataSetFut =
       distributedDataActor.ask(DistributedDataActor.GetAllData[DataItemBase])
