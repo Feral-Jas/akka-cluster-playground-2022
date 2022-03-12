@@ -26,20 +26,11 @@ object TestServer extends Loggable {
           Guice.createInjector(UniversalModule(appSettings, ctx))
         implicit val ec = ctx.executionContext
         val server = injector.instance[TestServer]
-        server.start.onComplete {
-          case Failure(exception) =>
-            throw exception
-            Behaviors.stopped(() => logger.error(exception.getMessage))
-          case Success(binding) =>
-            logger.info(
-              "Serving in " + binding.localAddress.getAddress.getCanonicalHostName + ":" + binding.localAddress.getPort
-            )
-        }
+        server.start()
         Behaviors.same
       },
-      "test-server"
+      appSettings.appName
     )
-
     try {
       init
     } catch {
@@ -55,11 +46,19 @@ object TestServer extends Loggable {
   }
 }
 class TestServer @Inject() (implicit val injector: ScalaInjector)
-    extends BaseRoute with UniversalModule.GlobalImplicits {
-  private val apiDependencyWiring = new ApiDependencyWiring()
-  def start = {
+    extends BaseRoute with Loggable
+    with UniversalModule.GlobalImplicits {
+  private val apiDependencyWiring = new ApiDependencyWiring
+  def start():Unit = {
     Http()
       .newServerAt("0.0.0.0", config.getInt("global-implicits.http-port"))
-      .bind(apiDependencyWiring.externalApis)
+      .bind(apiDependencyWiring.externalApis).onComplete {
+      case Failure(exception) =>
+        throw exception
+      case Success(binding) =>
+        logger.info(
+          settings.appName + " Serving in " + binding.localAddress.toString
+        )
+    }
   }
 }

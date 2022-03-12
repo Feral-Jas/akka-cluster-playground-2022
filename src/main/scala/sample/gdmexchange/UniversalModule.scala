@@ -63,8 +63,8 @@ case class UniversalModule(settings: Settings, actorContext: ActorContext[_])
   def clusterScheduler(
       distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]]
   ): ActorRef[ClusterScheduler.Task] = {
-    implicit val system = actoySys
-    implicit val executionContext = ec
+    implicit val system: ActorSystem[_] = actoySys
+    implicit val executionContext: ExecutionContext = ec
     val singletonManager = ClusterSingleton(actorContext.system)
     val actorRef: ActorRef[ClusterScheduler.Task] =
       singletonManager.init(
