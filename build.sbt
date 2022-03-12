@@ -7,6 +7,7 @@ val AkkaManagementVersion = "1.1.3"
 
 val `akka-cluster-playground` = project
   .in(file("."))
+  .enablePlugins(JavaAppPackaging)
   .settings(multiJvmSettings: _*)
   .settings(
     organization := "com.lightbend.akka.samples",
