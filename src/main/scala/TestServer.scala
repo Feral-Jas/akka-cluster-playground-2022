@@ -5,7 +5,6 @@ import akka.http.scaladsl.Http
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
 import com.google.inject.{Guice, Inject}
-import kamon.Kamon
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import sample.Loggable
 import sample.gdmexchange.UniversalModule
@@ -17,7 +16,8 @@ import scala.util.{Failure, Success}
   */
 object TestServer extends Loggable {
   def main(args: Array[String]): Unit = {
-    Kamon.init()
+//    if you are using Kamon
+//    Kamon.init()
     implicit val system: ActorSystem[Done] = ActorSystem(
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =

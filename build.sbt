@@ -4,8 +4,8 @@ import com.typesafe.sbt.SbtMultiJvm.multiJvmSettings
 val AkkaVersion = "2.6.18"
 val AkkaHttpVersion = "10.2.8"
 val AkkaManagementVersion = "1.1.3"
-val ExchangeCommonVersion = "1.8.28"
-val `akka-sample-distributed-data-scala` = project
+
+val `akka-cluster-playground` = project
   .in(file("."))
   .settings(multiJvmSettings: _*)
   .settings(
