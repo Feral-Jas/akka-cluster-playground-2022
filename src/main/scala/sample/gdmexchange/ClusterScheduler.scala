@@ -1,14 +1,10 @@
 package sample.gdmexchange
 
-import akka.actor.typed.{ActorRef, ActorSystem}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.AskPattern.{Askable, schedulerFromActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
-import com.colofabrix.scala.figlet4s.unsafe.{
-  FIGureOps,
-  Figlet4s,
-  OptionsBuilderOps
-}
+import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
 import io.gdmexchange.common.util.Loggable
 import sample.CborSerializable
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
@@ -26,10 +22,10 @@ object ClusterScheduler extends Loggable {
   implicit private val timeout: Timeout = 5.seconds
   def apply(
       distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]]
-  )(implicit actorSystem: ActorSystem[_], ec: ExecutionContext) = {
+  )(implicit actorSystem: ActorSystem[_], ec: ExecutionContext): Behavior[Task] = {
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
-      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
+      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
       Behaviors.receiveMessage[Task] {
         case ReloadConfigFromDBTask =>
           //load from db
@@ -67,7 +63,8 @@ object ClusterScheduler extends Loggable {
             }
           Behaviors.same
         case _ =>
-          Behaviors.ignore
+          throw new Exception("unknown message type")
+          Behaviors.same
       }
     }
   }
