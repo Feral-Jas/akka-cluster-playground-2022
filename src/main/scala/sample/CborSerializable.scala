@@ -1,6 +1,5 @@
 package sample
 
-/**
- * @author Chenyu.Liu
- */
+/** @author Chenyu.Liu
+  */
 trait CborSerializable

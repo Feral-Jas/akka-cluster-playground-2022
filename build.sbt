@@ -20,11 +20,15 @@ val `akka-sample-distributed-data-scala` = project
       "-Xlint"
     ),
     Compile / javacOptions ++= Seq("-Xlint:unchecked", "-Xlint:deprecation"),
-    run / javaOptions ++= Seq("-Xms128m", "-Xmx2048m"),
+    javaOptions ++= Seq(
+      "-Xms128m",
+      "-Xmx2048m",
+      // if you are using JDK17 please enable below
+      "-J--add-opens=java.base/java.util.concurrent=ALL_UNNAMED"
+    ),
     libraryDependencies ++= Seq(
-      // 1. Ascendex exchange-common stuff
-      "com.btmx" %% "common" % ExchangeCommonVersion,
-      "com.btmx" %% "web-server-common" % ExchangeCommonVersion,
+      // 1. your private dependencies
+
       // 2. Basic dependencies for a clustered application
       "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
       "com.typesafe.akka" %% "akka-stream-typed" % AkkaVersion,
@@ -44,11 +48,13 @@ val `akka-sample-distributed-data-scala` = project
       "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % AkkaManagementVersion,
       "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % AkkaManagementVersion,
       "com.typesafe.akka" %% "akka-discovery" % AkkaVersion,
-      "ch.qos.logback" % "logback-classic" % "1.2.9" % Test,
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+      "ch.qos.logback" % "logback-classic" % "1.2.11",
+      "org.scalatest" %% "scalatest" % "3.2.11" % Test,
       // 4. Extra tools
       "net.codingwell" %% "scala-guice" % "5.0.2",
-      "com.colofabrix.scala" %% "figlet4s-core" % "0.3.1"
+      "com.colofabrix.scala" %% "figlet4s-core" % "0.3.1",
+      "io.kamon" %% "kamon-bundle" % "2.4.8",
+      "io.kamon" %% "kamon-apm-reporter" % "2.4.8"
     ),
     run / fork := true,
     Global / cancelable := false, // ctrl-c

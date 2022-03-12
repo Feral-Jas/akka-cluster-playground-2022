@@ -1,15 +1,15 @@
 package sample.distributeddata
 
 import akka.remote.testkit.MultiNodeSpecCallbacks
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.wordspec.AnyWordSpecLike
 
-import org.scalatest.{ BeforeAndAfterAll, WordSpecLike }
-import org.scalatest.Matchers
-
-/**
- * Hooks up MultiNodeSpec with ScalaTest
- */
-trait STMultiNodeSpec extends MultiNodeSpecCallbacks
-  with WordSpecLike with Matchers with BeforeAndAfterAll {
+/** Hooks up MultiNodeSpec with ScalaTest
+  */
+trait STMultiNodeSpec
+    extends MultiNodeSpecCallbacks
+    with AnyWordSpecLike
+    with BeforeAndAfterAll {
 
   override def beforeAll() = multiNodeSpecBeforeAll()
 
