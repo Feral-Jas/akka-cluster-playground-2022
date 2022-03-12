@@ -13,13 +13,9 @@ import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-case class UniversalModule(actorContext: ActorContext[_])
-    extends AbstractModule
-    with ScalaModule
-    with Loggable {
-  override def configure(): Unit = {
+case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule with ScalaModule with Loggable {
+  override def configure(): Unit =
     bind[ActorContext[_]].toInstance(actorContext)
-  }
 
   @Provides
   @Singleton
@@ -31,8 +27,7 @@ case class UniversalModule(actorContext: ActorContext[_])
 
   @Provides
   @Singleton
-  def distributedConfig
-      : ActorRef[DistributedDataActor.Command[DataItemBase]] = {
+  def distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]] = {
     val actorRef =
       actorContext.spawn(
         DistributedDataActor.apply[TypedDataItem]("fp-api-server"),
@@ -47,10 +42,10 @@ case class UniversalModule(actorContext: ActorContext[_])
   def clusterScheduler(
       distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]]
   ): ActorRef[ClusterScheduler.Task] = {
-    implicit val system: ActorSystem[_] = actoySys
+    implicit val system: ActorSystem[_]             = actoySys
     implicit val executionContext: ExecutionContext = ec
-    val singletonManager = ClusterSingleton(actorContext.system)
-    val actorRef: ActorRef[ClusterScheduler.Task] =
+    val singletonManager                            = ClusterSingleton(actorContext.system)
+    val actorRef: ActorRef[ClusterScheduler.Task]   =
       singletonManager.init(
         SingletonActor(
           Behaviors
@@ -64,10 +59,10 @@ case class UniversalModule(actorContext: ActorContext[_])
   }
 }
 object UniversalModule {
-  trait GlobalImplicits {
+  trait GlobalImplicits        {
     implicit val injector: ScalaInjector
-    implicit val timeout: Timeout = 5.seconds
-    implicit val typedSystem: ActorSystem[_] = injector.instance[ActorSystem[_]]
+    implicit val timeout: Timeout                   = 5.seconds
+    implicit val typedSystem: ActorSystem[_]        = injector.instance[ActorSystem[_]]
     implicit val executionContext: ExecutionContext =
       injector.instance[ExecutionContext]
   }

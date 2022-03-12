@@ -13,12 +13,9 @@ import scala.concurrent.duration.DurationInt
 
 object DistributedDataActor extends Loggable {
   sealed trait Command[T <: DataItemBase]
-  final case class GetAllData[T <: DataItemBase](replyTo: ActorRef[DataSet[T]])
-      extends Command[DataItemBase]
-  final case class AddData[T <: DataItemBase](dataItem: DataItemBase)
-      extends Command[DataItemBase]
-  final case class RemoveData[T <: DataItemBase](dataName: String)
-      extends Command[DataItemBase]
+  final case class GetAllData[T <: DataItemBase](replyTo: ActorRef[DataSet[T]]) extends Command[DataItemBase]
+  final case class AddData[T <: DataItemBase](dataItem: DataItemBase)           extends Command[DataItemBase]
+  final case class RemoveData[T <: DataItemBase](dataName: String)              extends Command[DataItemBase]
 
   final case class DataSet[T <: DataItemBase](items: Set[T])
 
@@ -26,18 +23,18 @@ object DistributedDataActor extends Loggable {
   private case class InternalGetResponse[T <: DataItemBase](
       replyTo: ActorRef[DataSet[DataItemBase]],
       rsp: GetResponse[LWWMap[String, DataItemBase]]
-  ) extends InternalCommand[DataItemBase]
+  )                                                       extends InternalCommand[DataItemBase]
   private case class InternalUpdateResponse[A <: ReplicatedData](
       rsp: UpdateResponse[A]
-  ) extends InternalCommand[DataItemBase]
+  )                                                       extends InternalCommand[DataItemBase]
   private case class InternalRemoveItem[T <: DataItemBase](
       productId: String,
       getResponse: GetResponse[LWWMap[String, DataItemBase]]
-  ) extends InternalCommand[DataItemBase]
+  )                                                       extends InternalCommand[DataItemBase]
 
-  private val timeout = 3.seconds
-  private val readMajority = ReadMajority(timeout)
-  private val writeMajority = WriteMajority(timeout)
+  private val timeout                = 3.seconds
+  private val readMajority           = ReadMajority(timeout)
+  private val writeMajority          = WriteMajority(timeout)
   def apply[T <: DataItemBase](
       serviceName: String
   ): Behavior[Command[DataItemBase]] =
@@ -112,9 +109,8 @@ object DistributedDataActor extends Loggable {
           def updateData(
               data: LWWMap[String, DataItemBase],
               item: DataItemBase
-          ): LWWMap[String, DataItemBase] = {
+          ): LWWMap[String, DataItemBase] =
             data :+ (item.dataName -> item)
-          }
 
           def receiveRemoveItem: PartialFunction[Command[
             DataItemBase
@@ -143,7 +139,7 @@ object DistributedDataActor extends Loggable {
               Behaviors.same
           }
 
-          def removeItem(productId: String): Unit = {
+          def removeItem(productId: String): Unit =
             replicator.askUpdate(
               askReplyTo =>
                 Update(
@@ -156,7 +152,6 @@ object DistributedDataActor extends Loggable {
                 },
               InternalUpdateResponse.apply
             )
-          }
 
           def receiveOther: PartialFunction[Command[DataItemBase], Behavior[
             Command[DataItemBase]

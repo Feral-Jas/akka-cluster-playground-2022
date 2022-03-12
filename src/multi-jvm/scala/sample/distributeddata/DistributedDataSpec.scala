@@ -38,15 +38,12 @@ class DistributedDataSpecMultiJvmNode1 extends DistributedDataSpec
 class DistributedDataSpecMultiJvmNode2 extends DistributedDataSpec
 class DistributedDataSpecMultiJvmNode3 extends DistributedDataSpec
 
-class DistributedDataSpec
-    extends MultiNodeSpec(DistributedDataSpec)
-    with STMultiNodeSpec {
-  override def initialParticipants: Int = roles.size
-  implicit val typedSystem: ActorSystem[_] = system.toTyped
-  implicit val excutionContext = typedSystem.executionContext
-  val cluster = Cluster(typedSystem)
-  private val distributedDataActor
-      : ActorRef[DistributedDataActor.Command[DataItemBase]] =
+class DistributedDataSpec extends MultiNodeSpec(DistributedDataSpec) with STMultiNodeSpec {
+  override def initialParticipants: Int                                                  = roles.size
+  implicit val typedSystem: ActorSystem[_]                                               = system.toTyped
+  implicit val excutionContext                                                           = typedSystem.executionContext
+  val cluster                                                                            = Cluster(typedSystem)
+  private val distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]] =
     system.spawnAnonymous(DistributedDataActor("ascendex"))
 //  val singletonManager = ClusterSingleton(typedSystem)
 //  private val clusterScheduler: ActorRef[ClusterScheduler.Task] =
@@ -82,12 +79,12 @@ class DistributedDataSpec
     enterBarrier("updates-done")
 
     awaitAssert {
-      val probe = TestProbe[DistributedDataActor.DataSet[DataItemBase]]()
+      val probe     = TestProbe[DistributedDataActor.DataSet[DataItemBase]]()
       distributedDataActor ! DistributedDataActor.GetAllData(probe.ref)
       val configSet =
         probe.expectMessageType[DistributedDataActor.DataSet[DataItemBase]]
-      val KEY_1 = configSet.items.find(_.dataName == "key1")
-      val KEY_2 = configSet.items.find(_.dataName == "key2")
+      val KEY_1     = configSet.items.find(_.dataName == "key1")
+      val KEY_2     = configSet.items.find(_.dataName == "key2")
       KEY_1 shouldBe a[Some[_]]
       KEY_1.get shouldBe a[TypedDataItem]
       KEY_2 shouldBe a[Some[_]]
