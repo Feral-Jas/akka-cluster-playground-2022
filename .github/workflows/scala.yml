@@ -16,8 +16,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Check Scala Code Format
         run: |
-          chmod +x ./scalafmt
-          ./scalafmt --list
+            chmod +x ./scalafmt
+            ./scalafmt --list
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
