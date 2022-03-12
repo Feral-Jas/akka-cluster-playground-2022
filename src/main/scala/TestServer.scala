@@ -22,15 +22,14 @@ object TestServer extends Loggable {
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =
           Guice.createInjector(UniversalModule(ctx))
-        val server = injector.instance[TestServer]
+        val server                           = injector.instance[TestServer]
         server.start(args.last.toInt)
         Behaviors.same
       },
       "fp-api-server"
     )
-    try {
-      init
-    } catch {
+    try init
+    catch {
       case NonFatal(e) =>
         logger.error("Terminating due to initialization failure.", e)
         system.terminate()
@@ -46,17 +45,16 @@ class TestServer @Inject() (implicit val injector: ScalaInjector)
     extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring
-  def start(port: Int): Unit = {
+  def start(port: Int): Unit      =
     Http()
       .newServerAt("0.0.0.0", port)
       .bind(apiDependencyWiring.externalApis)
       .onComplete {
         case Failure(exception) =>
           throw exception
-        case Success(binding) =>
+        case Success(binding)   =>
           logger.info(
             " Serving in " + binding.localAddress.toString
           )
       }
-  }
 }

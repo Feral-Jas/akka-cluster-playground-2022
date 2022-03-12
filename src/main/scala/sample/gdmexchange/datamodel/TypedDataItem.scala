@@ -18,5 +18,5 @@ final case class TypedDataItem(
 object TypedDataItem extends Enumeration {
   type DType = Value
   val CONFIG: DType = Value("config")
-  val CACHE: DType = Value("cache")
+  val CACHE: DType  = Value("cache")
 }

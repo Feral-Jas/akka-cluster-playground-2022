@@ -15,8 +15,8 @@ import scala.util.{Failure, Random, Success}
 object ClusterScheduler extends Loggable {
   sealed trait Task
   case object ReloadConfigFromDBTask extends Task with CborSerializable
-  case object ReloadVaultTask extends Task with CborSerializable
-  case object SimpleLoggerTask extends Task with CborSerializable
+  case object ReloadVaultTask        extends Task with CborSerializable
+  case object SimpleLoggerTask       extends Task with CborSerializable
   //should be remove because AskPattern is not recommended inside an actor
   implicit private val timeout: Timeout = 5.seconds
   def apply(
@@ -24,7 +24,7 @@ object ClusterScheduler extends Loggable {
   )(implicit
       actorSystem: ActorSystem[_],
       ec: ExecutionContext
-  ): Behavior[Task] = {
+  ): Behavior[Task]                     =
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
       timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
@@ -42,7 +42,7 @@ object ClusterScheduler extends Loggable {
               case Failure(exception) =>
                 logger.error(exception.getMessage)
                 throw exception
-              case Success(dataSet) =>
+              case Success(dataSet)   =>
                 logger.info("===============DATA SUMMARY===============")
                 logger.info(s"total size = ${dataSet.items.size}")
                 logger.info(
@@ -54,7 +54,7 @@ object ClusterScheduler extends Loggable {
                 logger.info("==========================================")
             }
           Behaviors.same
-        case SimpleLoggerTask =>
+        case SimpleLoggerTask       =>
           Figlet4s
             .builder("BEEP")
             .render()
@@ -64,12 +64,11 @@ object ClusterScheduler extends Loggable {
               logger.info(line)
             }
           Behaviors.same
-        case _ =>
+        case _                      =>
           throw new Exception("unknown message type")
           Behaviors.same
       }
     }
-  }
   def doReloadConfigFromDb(
       distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]]
   ) = {
