@@ -1,19 +1,18 @@
 package sample.distributeddata
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
-import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter.ClassicActorSystemOps
-import akka.actor.typed.{ActorRef, ActorSystem, SupervisorStrategy}
+import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.cluster.ddata.Replicator
 import akka.cluster.ddata.typed.scaladsl.DistributedData
 import akka.cluster.ddata.typed.scaladsl.Replicator.{GetReplicaCount, ReplicaCount}
-import akka.cluster.typed.{Cluster, ClusterSingleton, Join, SingletonActor}
+import akka.cluster.typed.{Cluster, Join}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
 import com.typesafe.config.ConfigFactory
 import sample.distributeddata.DistributedDataSpec.{clusterNode1, clusterNode2, clusterNode3}
-import sample.gdmexchange.datamodel.DataItemBase
-import sample.gdmexchange.{ClusterScheduler, DistributedDataActor}
+import sample.gdmexchange.DistributedDataActor
+import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 
 import scala.concurrent.duration.DurationInt
 
@@ -45,10 +44,10 @@ class DistributedDataSpec
   val cluster = Cluster(typedSystem)
   private val distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]] =
     system.spawnAnonymous(DistributedDataActor("ascendex"))
-  val singletonManager = ClusterSingleton(typedSystem)
-  private val clusterScheduler: ActorRef[ClusterScheduler.Task] =
-   singletonManager.init(
-      SingletonActor(Behaviors.supervise(ClusterScheduler(distributedDataActor)).onFailure[Exception](SupervisorStrategy.restart), "ClusterScheduler"))
+//  val singletonManager = ClusterSingleton(typedSystem)
+//  private val clusterScheduler: ActorRef[ClusterScheduler.Task] =
+//   singletonManager.init(
+//      SingletonActor(Behaviors.supervise(ClusterScheduler(distributedDataActor)).onFailure[Exception](SupervisorStrategy.restart), "ClusterScheduler"))
 
   def join(from: RoleName, to: RoleName): Unit = {
     runOn(from) {
@@ -71,9 +70,10 @@ class DistributedDataSpec
       enterBarrier("after-1")
     }
   }
-  "Test ReloadDBTask" in within(10.seconds) {
+  "Test AddData" in within(5.seconds) {
     runOn(clusterNode2) {
-      clusterScheduler ! ClusterScheduler.ReloadConfigFromDBTask
+      distributedDataActor ! DistributedDataActor.AddData(TypedDataItem("key1"))
+      distributedDataActor ! DistributedDataActor.AddData(TypedDataItem("key2"))
     }
     enterBarrier("updates-done")
 
@@ -83,10 +83,10 @@ class DistributedDataSpec
       val configSet = probe.expectMessageType[DistributedDataActor.DataSet[DataItemBase]]
       val KEY_1 = configSet.items.find(_.dataName == "key1")
       val KEY_2 = configSet.items.find(_.dataName == "key2")
-//      KEY_1 shouldBe a[Some[TypedDataItem]]
-//      KEY_1.get.stringValueOpt shouldEqual Some("value1")
-//      KEY_2 shouldBe a[Some[ConfigItem]]
-//      KEY_2.get.stringValueOpt shouldEqual Some("value2")
+      KEY_1 shouldBe a[Some[_]]
+      KEY_1.get shouldBe a[TypedDataItem]
+      KEY_2 shouldBe a[Some[_]]
+      KEY_2.get shouldBe a[TypedDataItem]
     }
 
     enterBarrier("after-2")
