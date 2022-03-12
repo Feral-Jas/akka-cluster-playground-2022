@@ -11,7 +11,7 @@ import sample.gdmexchange.datamodel.DataItemBase
 
 import scala.concurrent.duration.DurationInt
 
-object DistributedDataActor extends Loggable{
+object DistributedDataActor extends Loggable {
   sealed trait Command[T <: DataItemBase]
   final case class GetAllData[T <: DataItemBase](replyTo: ActorRef[DataSet[T]])
       extends Command[DataItemBase]

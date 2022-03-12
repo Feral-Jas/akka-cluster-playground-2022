@@ -8,7 +8,8 @@ import sample.gdmexchange.{ClusterScheduler, DistributedDataActor, UniversalModu
 
 /** @author Chenyu.Liu
   */
-class ApiDependencyWiring(implicit val injector: ScalaInjector) extends UniversalModule.GlobalImplicits {
+class ApiDependencyWiring(implicit val injector: ScalaInjector)
+    extends UniversalModule.GlobalImplicits {
   private val distributedDataActor =
     injector.instance[ActorRef[DistributedDataActor.Command[DataItemBase]]]
   private val clusterScheduler =

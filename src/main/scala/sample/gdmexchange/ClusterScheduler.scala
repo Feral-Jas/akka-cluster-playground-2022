@@ -1,12 +1,12 @@
 package sample.gdmexchange
 
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.AskPattern.{Askable, schedulerFromActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
-import sample.{CborSerializable, Loggable}
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
+import sample.{CborSerializable, Loggable}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
@@ -21,7 +21,10 @@ object ClusterScheduler extends Loggable {
   implicit private val timeout: Timeout = 5.seconds
   def apply(
       distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]]
-  )(implicit actorSystem: ActorSystem[_], ec: ExecutionContext): Behavior[Task] = {
+  )(implicit
+      actorSystem: ActorSystem[_],
+      ec: ExecutionContext
+  ): Behavior[Task] = {
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
       timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)

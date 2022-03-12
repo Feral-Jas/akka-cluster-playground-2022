@@ -47,7 +47,7 @@ class TestServer @Inject() (implicit val injector: ScalaInjector)
     extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring
-  def start(port:Int): Unit = {
+  def start(port: Int): Unit = {
     Http()
       .newServerAt("0.0.0.0", port)
       .bind(apiDependencyWiring.externalApis)

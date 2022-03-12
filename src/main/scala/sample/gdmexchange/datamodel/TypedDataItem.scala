@@ -12,10 +12,9 @@ final case class TypedDataItem(
     override val createdAt: LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
 ) extends DataItemBase
 
-/**
- * TypedDataItem
- * used to define item type stored in distributed data
- */
+/** TypedDataItem
+  * used to define item type stored in distributed data
+  */
 object TypedDataItem extends Enumeration {
   type DType = Value
   val CONFIG: DType = Value("config")
