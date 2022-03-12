@@ -16,8 +16,8 @@ object ClusterScheduler extends Loggable {
   case object SimpleLoggerTask extends Task with CborSerializable
   def apply(distributedConfig: ActorRef[DistributedConfig.Command]) = {
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
-      timer.startTimerWithFixedDelay(ReloadVaultTask, 5.seconds)
-      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 5.seconds)
+      timer.startTimerWithFixedDelay(ReloadVaultTask, 10.seconds)
+      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
       Behaviors.receiveMessage[Task] {
         case ReloadConfigFromDBTask =>
