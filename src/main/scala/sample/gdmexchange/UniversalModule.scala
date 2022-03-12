@@ -13,7 +13,7 @@ import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-case class UniversalModule( actorContext: ActorContext[_])
+case class UniversalModule(actorContext: ActorContext[_])
     extends AbstractModule
     with ScalaModule
     with Loggable {

@@ -10,6 +10,7 @@ import akka.cluster.typed.{Cluster, Join}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
 import com.typesafe.config.ConfigFactory
+import org.scalatest.matchers.should.Matchers.{a, convertToAnyShouldWrapper}
 import sample.distributeddata.DistributedDataSpec.{clusterNode1, clusterNode2, clusterNode3}
 import sample.gdmexchange.DistributedDataActor
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
