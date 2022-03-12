@@ -11,9 +11,9 @@ import akka.cluster.typed.{Cluster, ClusterSingleton, Join, SingletonActor}
 import akka.remote.testconductor.RoleName
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec}
 import com.typesafe.config.ConfigFactory
-import sample.gdmexchange.DistributedConfig.{ConfigItem, ConfigSet}
 import sample.distributeddata.DistributedDataSpec.{clusterNode1, clusterNode2, clusterNode3}
-import sample.gdmexchange.{ClusterScheduler, DistributedConfig}
+import sample.gdmexchange.datamodel.DataItemBase
+import sample.gdmexchange.{ClusterScheduler, DistributedDataActor}
 
 import scala.concurrent.duration.DurationInt
 
@@ -28,7 +28,6 @@ object DistributedDataSpec extends MultiNodeConfig {
     akka.log-dead-letters-during-shutdown = off
     akka.actor.serialization-bindings {
       "sample.CborSerializable" = jackson-cbor
-
     }
     """))
 
@@ -42,13 +41,14 @@ class DistributedDataSpec
   extends MultiNodeSpec(DistributedDataSpec) with STMultiNodeSpec {
   override def initialParticipants: Int = roles.size
   implicit val typedSystem: ActorSystem[_] = system.toTyped
+  implicit val excutionContext = typedSystem.executionContext
   val cluster = Cluster(typedSystem)
-  private val distributedConfig: ActorRef[DistributedConfig.Command] =
-    system.spawnAnonymous(DistributedConfig("ascendex"))
+  private val distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]] =
+    system.spawnAnonymous(DistributedDataActor("ascendex"))
   val singletonManager = ClusterSingleton(typedSystem)
   private val clusterScheduler: ActorRef[ClusterScheduler.Task] =
    singletonManager.init(
-      SingletonActor(Behaviors.supervise(ClusterScheduler(distributedConfig)).onFailure[Exception](SupervisorStrategy.restart), "ClusterScheduler"))
+      SingletonActor(Behaviors.supervise(ClusterScheduler(distributedDataActor)).onFailure[Exception](SupervisorStrategy.restart), "ClusterScheduler"))
 
   def join(from: RoleName, to: RoleName): Unit = {
     runOn(from) {
@@ -78,64 +78,17 @@ class DistributedDataSpec
     enterBarrier("updates-done")
 
     awaitAssert {
-      val probe = TestProbe[DistributedConfig.ConfigSet]()
-      distributedConfig ! DistributedConfig.GetAllConfig(probe.ref)
-      val configSet = probe.expectMessageType[ConfigSet]
-      val KEY_1 = configSet.items.find(_.configName == "key1")
-      val KEY_2 = configSet.items.find(_.configName == "key2")
-      KEY_1 shouldBe a[Some[ConfigItem]]
-      KEY_1.get.stringValueOpt shouldEqual Some("value1")
-      KEY_2 shouldBe a[Some[ConfigItem]]
-      KEY_2.get.stringValueOpt shouldEqual Some("value2")
+      val probe = TestProbe[DistributedDataActor.DataSet[DataItemBase]]()
+      distributedDataActor ! DistributedDataActor.GetAllData(probe.ref)
+      val configSet = probe.expectMessageType[DistributedDataActor.DataSet[DataItemBase]]
+      val KEY_1 = configSet.items.find(_.dataName == "key1")
+      val KEY_2 = configSet.items.find(_.dataName == "key2")
+//      KEY_1 shouldBe a[Some[TypedDataItem]]
+//      KEY_1.get.stringValueOpt shouldEqual Some("value1")
+//      KEY_2 shouldBe a[Some[ConfigItem]]
+//      KEY_2.get.stringValueOpt shouldEqual Some("value2")
     }
 
     enterBarrier("after-2")
-  }
-  "Test ReloadVaultTask" in within(10.seconds) {
-    runOn(clusterNode3) {
-      clusterScheduler ! ClusterScheduler.ReloadVaultTask
-    }
-    enterBarrier("updates-done")
-
-    awaitAssert {
-      val probe = TestProbe[DistributedConfig.ConfigSet]()
-      distributedConfig ! DistributedConfig.GetAllConfig(probe.ref)
-      val configSet = probe.expectMessageType[ConfigSet]
-      val KEY_3 = configSet.items.find(_.configName == "key3")
-      val KEY_4 = configSet.items.find(_.configName == "key4")
-      KEY_3 shouldBe a[Some[ConfigItem]]
-      KEY_3.get.decimalValueOpt shouldEqual Some(3)
-      KEY_4 shouldBe a[Some[ConfigItem]]
-      KEY_4.get.decimalValueOpt shouldEqual Some(4)
-    }
-
-    enterBarrier("after-3")
-  }
-  "Test ReloadVaultTask & ReloadConfigFromDBTask" in within(10.seconds) {
-    runOn(clusterNode1) {
-      clusterScheduler ! ClusterScheduler.ReloadConfigFromDBTask
-      clusterScheduler ! ClusterScheduler.ReloadVaultTask
-    }
-    enterBarrier("updates-all-done")
-
-    awaitAssert {
-      val probe = TestProbe[DistributedConfig.ConfigSet]()
-      distributedConfig ! DistributedConfig.GetAllConfig(probe.ref)
-      val configSet = probe.expectMessageType[ConfigSet]
-      val KEY_1 = configSet.items.find(_.configName == "key1")
-      val KEY_2 = configSet.items.find(_.configName == "key2")
-      val KEY_3 = configSet.items.find(_.configName == "key3")
-      val KEY_4 = configSet.items.find(_.configName == "key4")
-      KEY_1 shouldBe a[Some[ConfigItem]]
-      KEY_1.get.stringValueOpt shouldEqual Some("value1")
-      KEY_2 shouldBe a[Some[ConfigItem]]
-      KEY_2.get.stringValueOpt shouldEqual Some("value2")
-      KEY_3 shouldBe a[Some[ConfigItem]]
-      KEY_3.get.decimalValueOpt shouldEqual Some(3)
-      KEY_4 shouldBe a[Some[ConfigItem]]
-      KEY_4.get.decimalValueOpt shouldEqual Some(4)
-    }
-
-    enterBarrier("after-3")
   }
 }
