@@ -1,23 +1,23 @@
-### Akka Cluster Usage
+## Akka Cluster Usage
 ![alt text](./akka-cluster-design.png)
 
 #### Design Origin
 1. Avoid single node failure
 2. Provide better availability
 3. Built-in management of nodes and actors
+4. ClusterSingleton Actor spawn immediately on other JVM
 
-#### How to test(please use branch:cleaned)
-1. sbt multi-jvm:test 
-2. sbt multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
+
+#### How to test
+1. sbt (go to sbt shell)
+2. multi-jvm:test 
+3. multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
+
 
 #### How to run
 1. define program args 
-   1. -e staging -i 0/1/2
-2. define environment variable 
-   3. CANONICAL_PORT=2551/2552/2553 
-   4. MANAGE_PORT=9101/9102/9103
-   5. STAGING_CUSTOM_HOSTNAME=10.6.1.103
-   6. HTTP_PORT=3000 (will be the endpoint for APIs)
+  1. 3000/3001/3002 for http port
+
 3. have fun (currently there's nothing defined in cluster)
 
 #### TODOs
@@ -25,7 +25,7 @@
 2. provide an universal task manager among cluster
 
 ~~oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo~~
-
+# Below is from Akka Distributed Data
 This tutorial contains 5 samples illustrating how to use [Akka Distributed Data](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html).
 
 - Low Latency Voting Service
