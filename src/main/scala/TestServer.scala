@@ -26,7 +26,7 @@ object TestServer extends Loggable {
         server.start(args.last.toInt)
         Behaviors.same
       },
-      "fp-api-server"
+    "playground"
     )
     try init
     catch {
