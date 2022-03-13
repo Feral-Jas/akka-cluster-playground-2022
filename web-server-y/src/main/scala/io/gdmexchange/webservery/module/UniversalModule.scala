@@ -1,4 +1,4 @@
-package sample.gdmexchange
+package io.gdmexchange.webservery.module
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem, SupervisorStrategy}
@@ -9,6 +9,7 @@ import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import net.codingwell.scalaguice.ScalaModule
 import sample.Loggable
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
+import sample.gdmexchange.{ClusterScheduler, DistributedDataActor}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
@@ -27,13 +28,13 @@ case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule
 
   @Provides
   @Singleton
-  def distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]] = {
+  def distributedDataActor(appName: String): ActorRef[DistributedDataActor.Command[DataItemBase]] = {
     val actorRef =
       actorContext.spawn(
-        DistributedDataActor.apply[TypedDataItem]("fp-api-server"),
-        "ddata"
+        DistributedDataActor.apply[TypedDataItem](appName),
+        "DistributedDataActor"
       )
-    logger.info("++++++++++|Actor::DistributedConfig spawned")
+    logger.info("++++++++++|Actor::DistributedDataActor spawned")
     actorRef
   }
 

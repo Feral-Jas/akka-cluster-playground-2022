@@ -1,13 +1,16 @@
+package io.gdmexchange.webserverx
+
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern.{Askable, schedulerFromActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import io.gdmexchange.webserverx.module.UniversalModule
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import sample.gdmexchange.datamodel.DataItemBase
-import sample.gdmexchange.{ClusterScheduler, DistributedDataActor, UniversalModule}
+import sample.gdmexchange.{ClusterScheduler, DistributedDataActor}
 
 /** @author Chenyu.Liu
-  */
+ */
 class ApiDependencyWiring(implicit val injector: ScalaInjector) extends UniversalModule.GlobalImplicits {
   private val distributedDataActor =
     injector.instance[ActorRef[DistributedDataActor.Command[DataItemBase]]]
@@ -38,3 +41,4 @@ class ApiDependencyWiring(implicit val injector: ScalaInjector) extends Universa
     }
   }
 }
+

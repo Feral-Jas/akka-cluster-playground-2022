@@ -1,3 +1,4 @@
+package io.gdmexchange.webserverx
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -5,28 +6,28 @@ import akka.http.scaladsl.Http
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
 import com.google.inject.{Guice, Inject}
+import io.gdmexchange.webserverx.module.UniversalModule
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import sample.Loggable
-import sample.gdmexchange.UniversalModule
 
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /** @author Chenyu.Liu
-  */
-object TestServer extends Loggable {
+ */
+object WebServerX extends Loggable {
   def main(args: Array[String]): Unit = {
-//    if you are using Kamon
-//    Kamon.init()
+    //    if you are using Kamon
+    //    Kamon.init()
     implicit val system: ActorSystem[Done] = ActorSystem(
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =
           Guice.createInjector(UniversalModule(ctx))
-        val server                           = injector.instance[TestServer]
+        val server                           = injector.instance[WebServerX]
         server.start(args.last.toInt)
         Behaviors.same
       },
-    "playground"
+      "playground"
     )
     try init
     catch {
@@ -41,8 +42,8 @@ object TestServer extends Loggable {
     ClusterBootstrap(system).start()
   }
 }
-class TestServer @Inject() (implicit val injector: ScalaInjector)
-    extends Loggable
+class WebServerX @Inject() (implicit val injector: ScalaInjector)
+  extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring
   def start(port: Int): Unit      =
@@ -58,3 +59,4 @@ class TestServer @Inject() (implicit val injector: ScalaInjector)
           )
       }
 }
+
