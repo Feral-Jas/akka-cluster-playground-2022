@@ -15,7 +15,7 @@ import scala.util.{Failure, Success}
 
 /** @author Chenyu.Liu
  */
-object WebServerX extends Loggable {
+object DistributedDataService extends Loggable {
   def main(args: Array[String]): Unit = {
     //    if you are using Kamon
     //    Kamon.init()
@@ -23,11 +23,11 @@ object WebServerX extends Loggable {
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =
           Guice.createInjector(UniversalModule(ctx))
-        val server                           = injector.instance[WebServerX]
-        server.start(args.last.toInt)
+        val server                           = injector.instance[DistributedDataService]
+        server.start(System.getenv("HTTP_PORT").toInt)
         Behaviors.same
       },
-      "playground"
+      "WebServerX"
     )
     try init
     catch {
@@ -42,7 +42,7 @@ object WebServerX extends Loggable {
     ClusterBootstrap(system).start()
   }
 }
-class WebServerX @Inject() (implicit val injector: ScalaInjector)
+class DistributedDataService @Inject()(implicit val injector: ScalaInjector)
   extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring

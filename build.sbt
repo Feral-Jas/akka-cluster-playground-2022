@@ -51,12 +51,7 @@ val `distributed-data-typed` = project
       "com.lightbend.akka.discovery"  %% "akka-discovery-kubernetes-api"     % AkkaManagementVersion,
       "com.typesafe.akka"             %% "akka-discovery"                    % AkkaVersion,
       "ch.qos.logback"                 % "logback-classic"                   % "1.2.11",
-      "org.scalatest"                 %% "scalatest"                         % "3.2.11"    % Test,
-      // 4. Extra tools
-      "net.codingwell"                %% "scala-guice"                       % "5.0.2",
-      "com.colofabrix.scala"          %% "figlet4s-core"                     % "0.3.1",
-      "io.kamon"                      %% "kamon-bundle"                      % "2.4.8",
-      "io.kamon"                      %% "kamon-apm-reporter"                % "2.4.8"
+      "org.scalatest"                 %% "scalatest"                         % "3.2.11"    % Test
     ),
     run / fork := true,
     Global / cancelable := false, // ctrl-c
@@ -67,11 +62,15 @@ val `distributed-data-typed` = project
     Test / logBuffered := false
   )
   .configs(MultiJvm)
-val testServer1 = project
-  .in(file("web-server-x"))
+val distributedDataService   = project
+  .in(file("distributed-data-service"))
   .enablePlugins(JavaAppPackaging)
   .dependsOn(`distributed-data-typed`)
-val testServer2 =project
-  .in(file("web-server-y"))
-  .enablePlugins(JavaAppPackaging)
-  .dependsOn(`distributed-data-typed`)
+  .settings(
+    libraryDependencies ++= Seq(
+      "net.codingwell"       %% "scala-guice"        % "5.0.2",
+      "com.colofabrix.scala" %% "figlet4s-core"      % "0.3.1",
+      "io.kamon"             %% "kamon-bundle"       % "2.4.8",
+      "io.kamon"             %% "kamon-apm-reporter" % "2.4.8"
+    )
+  )
