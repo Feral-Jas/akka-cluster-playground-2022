@@ -63,7 +63,7 @@ you should be aware of. For example, Akka Distributed Data is not intended for _
 Distributed Data is great for low latency services, since you can update or get data from the local replica without
 immediate communication with other nodes.
 
-Open [VotingService.scala](src/main/scala/sample/distributeddata/VotingService.scala).
+Open [VotingService.scala](distributed-data-typed/src/main/scala/sample/distributeddata/VotingService.scala).
 
 `VotingService` is an actor for low latency counting of votes on several cluster nodes and aggregation of the grand
 total number of votes. The actor is started on each cluster node. First it expects an `Open` message on one or several
@@ -100,7 +100,7 @@ The total number of votes is retrieved with:
       replyTo ! Votes(data.entries, open)
 
 The multi-node test for the `VotingService` can be found
-in [VotingServiceSpec.scala](src/multi-jvm/scala/sample/distributeddata/VotingServiceSpec.scala).
+in [VotingServiceSpec.scala](distributed-data-typed/src/multi-jvm/scala/sample/distributeddata/VotingServiceSpec.scala).
 
 Read the [Using the Replicator](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html#using-the-replicator)
 documentation for more details of how to use `Get`, `Update`, and `Subscribe`.
@@ -110,7 +110,7 @@ documentation for more details of how to use `Get`, `Update`, and `Subscribe`.
 Distributed Data is great for highly available services, since it is possible to perform updates to the local node (or
 currently available nodes) during a network partition.
 
-Open [ShoppingCart.scala](src/main/scala/sample/distributeddata/ShoppingCart.scala).
+Open [ShoppingCart.scala](distributed-data-typed/src/main/scala/sample/distributeddata/ShoppingCart.scala).
 
 `ShoppingCart` is an actor that holds the selected items to buy for a user. The actor instance for a specific user may
 be started where ever needed in the cluster, i.e. several instances may be started on different nodes and used at the
@@ -128,7 +128,7 @@ the [gossip protocol](https://en.wikipedia.org/wiki/Gossip_protocol) and the `LW
 highly available shopping cart.
 
 The multi-node test for the `ShoppingCart` can be found
-in [ShoppingCartSpec.scala](src/multi-jvm/scala/sample/distributeddata/ShoppingCartSpec.scala).
+in [ShoppingCartSpec.scala](distributed-data-typed/src/multi-jvm/scala/sample/distributeddata/ShoppingCartSpec.scala).
 
 Read the [Consistency](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html#consistency) section in the
 documentation to understand the consistency considerations.
@@ -137,7 +137,7 @@ documentation to understand the consistency considerations.
 
 This example illustrates a simple key-value cache.
 
-Open [ReplicatedCache.scala](src/main/scala/sample/distributeddata/ReplicatedCache.scala).
+Open [ReplicatedCache.scala](distributed-data-typed/src/main/scala/sample/distributeddata/ReplicatedCache.scala).
 
 `ReplicatedCache` is an actor that is started on each node in the cluster. It supports three commands: `PutInCache`
 , `GetFromCache` and `Evict`.
@@ -150,20 +150,20 @@ be replicated at the same time and you may see inconsistencies between related e
 cannot be updated atomically together.
 
 The multi-node test for the `ReplicatedCache` can be found
-in [ReplicatedCacheSpec.scala](src/multi-jvm/scala/sample/distributeddata/ReplicatedCacheSpec.scala).
+in [ReplicatedCacheSpec.scala](distributed-data-typed/src/multi-jvm/scala/sample/distributeddata/ReplicatedCacheSpec.scala).
 
 ## Replicated Metrics
 
 This example illustrates to spread metrics data to all nodes in an Akka cluster.
 
-Open [ReplicatedMetrics.scala](src/main/scala/sample/distributeddata/ReplicatedMetrics.scala).
+Open [ReplicatedMetrics.scala](distributed-data-typed/src/main/scala/sample/distributeddata/ReplicatedMetrics.scala).
 
 `ReplicatedMetrics` is an actor that is started on each node in the cluster. Periodically it collects some metrics, in
 this case used and max heap size. Each metrics type is stored in a `LWWMap` where the key in the map is the address of
 the node. The values are disseminated to other nodes with the gossip protocol.
 
 The multi-node test for the `ReplicatedCache` can be found
-in [ReplicatedMetricsSpec.scala](src/multi-jvm/scala/sample/distributeddata/ReplicatedMetricsSpec.scala).
+in [ReplicatedMetricsSpec.scala](distributed-data-typed/src/multi-jvm/scala/sample/distributeddata/ReplicatedMetricsSpec.scala).
 
 Note that there are some [Limitations](https://doc.akka.io/docs/akka/2.6/typed/distributed-data.html#limitations) that
 you should be aware of. For example, Akka Distributed Data is not intended for _Big Data_.

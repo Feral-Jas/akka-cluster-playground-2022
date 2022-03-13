@@ -5,12 +5,12 @@ val AkkaVersion           = "2.6.18"
 val AkkaHttpVersion       = "10.2.8"
 val AkkaManagementVersion = "1.1.3"
 
-val `akka-cluster-playground` = project
-  .in(file("."))
+val `distributed-data-typed` = project
+  .in(file("distributed-data-typed"))
   .enablePlugins(JavaAppPackaging)
   .settings(multiJvmSettings: _*)
   .settings(
-    organization := "com.lightbend.akka.samples",
+    organization := "com.btmx",
     version := "1.0",
     scalaVersion := "2.12.11",
     Compile / scalacOptions ++= Seq(
@@ -64,9 +64,14 @@ val `akka-cluster-playground` = project
     Test / parallelExecution := false,
     // show full stack traces and test case durations
     Test / testOptions += Tests.Argument("-oDF"),
-    Test / logBuffered := false,
-    licenses := Seq(
-      ("CC0", url("http://creativecommons.org/publicdomain/zero/1.0"))
-    )
+    Test / logBuffered := false
   )
   .configs(MultiJvm)
+val testServer1 = project
+  .in(file("web-server-x"))
+  .enablePlugins(JavaAppPackaging)
+  .dependsOn(`distributed-data-typed`)
+val testServer2 =project
+  .in(file("web-server-y"))
+  .enablePlugins(JavaAppPackaging)
+  .dependsOn(`distributed-data-typed`)
