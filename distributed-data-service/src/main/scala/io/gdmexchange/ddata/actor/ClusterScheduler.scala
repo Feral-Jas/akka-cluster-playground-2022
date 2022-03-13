@@ -1,10 +1,15 @@
-package sample.gdmexchange
+package io.gdmexchange.ddata.actor
+
+/**
+ * @author Chenyu.Liu
+ */
 
 import akka.actor.typed.scaladsl.AskPattern.{Askable, schedulerFromActorSystem}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
+import sample.gdmexchange.DistributedDataActor
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 import sample.{CborSerializable, Loggable}
 
@@ -20,11 +25,11 @@ object ClusterScheduler extends Loggable {
   //should be remove because AskPattern is not recommended inside an actor
   implicit private val timeout: Timeout = 5.seconds
   def apply(
-      distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]]
-  )(implicit
-      actorSystem: ActorSystem[_],
-      ec: ExecutionContext
-  ): Behavior[Task]                     =
+             distributedDataActor: ActorRef[DistributedDataActor.Command[DataItemBase]]
+           )(implicit
+             actorSystem: ActorSystem[_],
+             ec: ExecutionContext
+           ): Behavior[Task]                     =
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
       timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
@@ -70,8 +75,8 @@ object ClusterScheduler extends Loggable {
       }
     }
   def doReloadConfigFromDb(
-      distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]]
-  ) = {
+                            distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]]
+                          ) = {
     distributedConfig ! DistributedDataActor.AddData(
       TypedDataItem(
         "key" + Random.nextInt(100),
@@ -89,3 +94,4 @@ object ClusterScheduler extends Loggable {
   }
 
 }
+

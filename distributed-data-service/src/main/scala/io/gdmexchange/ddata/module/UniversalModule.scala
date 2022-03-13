@@ -1,15 +1,16 @@
-package io.gdmexchange.webserverx.module
+package io.gdmexchange.ddata.module
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem, SupervisorStrategy}
 import akka.cluster.typed.{ClusterSingleton, SingletonActor}
 import akka.util.Timeout
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import io.gdmexchange.ddata.actor.ClusterScheduler
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import net.codingwell.scalaguice.ScalaModule
 import sample.Loggable
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
-import sample.gdmexchange.{ClusterScheduler, DistributedDataActor}
+import sample.gdmexchange.DistributedDataActor
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt

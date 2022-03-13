@@ -1,4 +1,4 @@
-package io.gdmexchange.webserverx
+package io.gdmexchange.ddata
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
@@ -6,7 +6,7 @@ import akka.http.scaladsl.Http
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
 import com.google.inject.{Guice, Inject}
-import io.gdmexchange.webserverx.module.UniversalModule
+import io.gdmexchange.ddata.module.UniversalModule
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import sample.Loggable
 
