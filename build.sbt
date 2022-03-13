@@ -5,14 +5,15 @@ val AkkaVersion           = "2.6.18"
 val AkkaHttpVersion       = "10.2.8"
 val AkkaManagementVersion = "1.1.3"
 
+ThisBuild / organization := "com.btmx"
+ThisBuild / version := "1.0"
+ThisBuild / scalaVersion := "2.12.11"
+
 val `distributed-data-typed` = project
   .in(file("distributed-data-typed"))
   .enablePlugins(JavaAppPackaging)
   .settings(multiJvmSettings: _*)
   .settings(
-    organization := "com.btmx",
-    version := "1.0",
-    scalaVersion := "2.12.11",
     Compile / scalacOptions ++= Seq(
       "-deprecation",
       "-feature",
@@ -62,7 +63,7 @@ val `distributed-data-typed` = project
     Test / logBuffered := false
   )
   .configs(MultiJvm)
-val distributedDataService   = project
+val `distributed-data-service`   = project
   .in(file("distributed-data-service"))
   .enablePlugins(JavaAppPackaging)
   .dependsOn(`distributed-data-typed`)

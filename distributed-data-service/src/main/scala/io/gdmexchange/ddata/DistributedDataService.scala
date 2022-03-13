@@ -27,7 +27,7 @@ object DistributedDataService extends Loggable {
         server.start(System.getenv("HTTP_PORT").toInt)
         Behaviors.same
       },
-      "WebServerX"
+      "ddata"
     )
     try init
     catch {
