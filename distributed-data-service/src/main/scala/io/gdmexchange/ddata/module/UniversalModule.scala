@@ -31,7 +31,7 @@ case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule
 
   @Provides
   @Singleton
-  def distributedDataActor(appName:String): ActorRef[DistributedDataActor.Command[DataItemBase]] = {
+  def distributedDataActor(appName: String): ActorRef[DistributedDataActor.Command[DataItemBase]] = {
     val actorRef =
       actorContext.spawn(
         DistributedDataActor.apply[TypedDataItem](appName),

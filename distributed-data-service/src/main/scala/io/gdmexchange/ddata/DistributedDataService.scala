@@ -14,7 +14,7 @@ import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /** @author Chenyu.Liu
- */
+  */
 object DistributedDataService extends Loggable {
   def main(args: Array[String]): Unit = {
     //    if you are using Kamon
@@ -42,8 +42,8 @@ object DistributedDataService extends Loggable {
     ClusterBootstrap(system).start()
   }
 }
-class DistributedDataService @Inject()(implicit val injector: ScalaInjector)
-  extends Loggable
+class DistributedDataService @Inject() (implicit val injector: ScalaInjector)
+    extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring
   def start(port: Int): Unit      =
@@ -59,4 +59,3 @@ class DistributedDataService @Inject()(implicit val injector: ScalaInjector)
           )
       }
 }
-

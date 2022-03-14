@@ -9,7 +9,7 @@ ThisBuild / organization := "com.btmx"
 ThisBuild / version := "1.0"
 ThisBuild / scalaVersion := "2.12.11"
 
-val `distributed-data-typed` = project
+val `distributed-data-typed`   = project
   .in(file("distributed-data-typed"))
   .enablePlugins(JavaAppPackaging)
   .settings(multiJvmSettings: _*)
@@ -63,7 +63,7 @@ val `distributed-data-typed` = project
     Test / logBuffered := false
   )
   .configs(MultiJvm)
-val `distributed-data-service`   = project
+val `distributed-data-service` = project
   .in(file("distributed-data-service"))
   .enablePlugins(JavaAppPackaging)
   .dependsOn(`distributed-data-typed`)
