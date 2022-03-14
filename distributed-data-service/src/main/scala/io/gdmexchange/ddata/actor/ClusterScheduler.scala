@@ -31,12 +31,12 @@ object ClusterScheduler extends Loggable {
   ): Behavior[Task]                     =
     Behaviors.withTimers[ClusterScheduler.Task] { timer =>
       timer.startTimerWithFixedDelay(SimpleLoggerTask, 5.seconds)
-      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 10.seconds)
+      timer.startTimerWithFixedDelay(ReloadConfigFromDBTask, 5.seconds)
       Behaviors.receiveMessage[Task] {
         case ReloadConfigFromDBTask =>
           //load from db
-          logger.info("<<<< Reload config from database")
-          doReloadConfigFromDb(distributedDataActor)
+//          logger.info("<<<< Reload config from database")
+//          doReloadConfigFromDb(distributedDataActor)
           //remove ask later
           distributedDataActor
             .ask(
@@ -48,13 +48,17 @@ object ClusterScheduler extends Loggable {
                 throw exception
               case Success(dataSet)   =>
                 logger.info("===============DATA SUMMARY===============")
-                logger.info(s"total size = ${dataSet.items.size}")
-                logger.info(
-                  s"youngest record = ${dataSet.items.toList.minBy(_.createdAt.getSecond).toString}"
-                )
-                logger.info(
-                  s"oldest record = ${dataSet.items.toList.maxBy(_.createdAt.getSecond).toString}"
-                )
+                if (dataSet.items.isEmpty) {
+                  logger.info("empty set")
+                } else {
+                  logger.info(s"total size = ${dataSet.items.size}")
+                  logger.info(
+                    s"youngest record = ${dataSet.items.toList.minBy(_.createdAt.getSecond).toString}"
+                  )
+                  logger.info(
+                    s"oldest record = ${dataSet.items.toList.maxBy(_.createdAt.getSecond).toString}"
+                  )
+                }
                 logger.info("==========================================")
             }
           Behaviors.same
