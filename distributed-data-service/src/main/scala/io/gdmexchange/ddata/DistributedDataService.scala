@@ -1,32 +1,38 @@
+package io.gdmexchange.ddata
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
+import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
 import com.google.inject.{Guice, Inject}
+import io.gdmexchange.ddata.module.UniversalModule
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import sample.Loggable
-import sample.gdmexchange.UniversalModule
+import com.lightbend.emoji.Emoji.Implicits._
+import com.lightbend.emoji.ShortCodes.Defaults._
+import com.lightbend.emoji.ShortCodes.Implicits.Emojilator
 
+import java.net.Inet4Address
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success}
 
 /** @author Chenyu.Liu
   */
-object TestServer extends Loggable {
+object DistributedDataService extends Loggable {
   def main(args: Array[String]): Unit = {
-//    if you are using Kamon
-//    Kamon.init()
+    //    if you are using Kamon
+    //    Kamon.init()
     implicit val system: ActorSystem[Done] = ActorSystem(
       Behaviors.setup[Done] { ctx =>
         implicit val injector: ScalaInjector =
           Guice.createInjector(UniversalModule(ctx))
-        val server                           = injector.instance[TestServer]
-        server.start(args.last.toInt)
+        val server                           = injector.instance[DistributedDataService]
+        server.start(System.getenv("HTTP_PORT").toInt)
         Behaviors.same
       },
-      "fp-api-server"
+      "ddata"
     )
     try init
     catch {
@@ -41,7 +47,7 @@ object TestServer extends Loggable {
     ClusterBootstrap(system).start()
   }
 }
-class TestServer @Inject() (implicit val injector: ScalaInjector)
+class DistributedDataService @Inject() (implicit val injector: ScalaInjector)
     extends Loggable
     with UniversalModule.GlobalImplicits {
   private val apiDependencyWiring = new ApiDependencyWiring
@@ -53,8 +59,15 @@ class TestServer @Inject() (implicit val injector: ScalaInjector)
         case Failure(exception) =>
           throw exception
         case Success(binding)   =>
-          logger.info(
-            " Serving in " + binding.localAddress.toString
-          )
+          Figlet4s
+            .builder("akka cluster")
+            .render()
+            .asSeq()
+            .zipWithIndex
+            .foreach { case (line, i) =>
+              if (i == 4) logger.info(e"$line :rainbow:Serving in ${(binding.localAddress.getAddress)}:$port:rainbow:")
+              else
+                logger.info(line)
+            }
       }
 }

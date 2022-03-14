@@ -5,13 +5,15 @@ val AkkaVersion           = "2.6.18"
 val AkkaHttpVersion       = "10.2.8"
 val AkkaManagementVersion = "1.1.3"
 
-val `akka-cluster-playground` = project
-  .in(file("."))
+ThisBuild / organization := "com.btmx"
+ThisBuild / version := "1.0"
+ThisBuild / scalaVersion := "2.12.11"
+
+val `distributed-data-typed`   = project
+  .in(file("distributed-data-typed"))
+  .enablePlugins(JavaAppPackaging)
   .settings(multiJvmSettings: _*)
   .settings(
-    organization := "com.lightbend.akka.samples",
-    version := "1.0",
-    scalaVersion := "2.12.11",
     Compile / scalacOptions ++= Seq(
       "-deprecation",
       "-feature",
@@ -51,11 +53,8 @@ val `akka-cluster-playground` = project
       "com.typesafe.akka"             %% "akka-discovery"                    % AkkaVersion,
       "ch.qos.logback"                 % "logback-classic"                   % "1.2.11",
       "org.scalatest"                 %% "scalatest"                         % "3.2.11"    % Test,
-      // 4. Extra tools
-      "net.codingwell"                %% "scala-guice"                       % "5.0.2",
-      "com.colofabrix.scala"          %% "figlet4s-core"                     % "0.3.1",
-      "io.kamon"                      %% "kamon-bundle"                      % "2.4.8",
-      "io.kamon"                      %% "kamon-apm-reporter"                % "2.4.8"
+      // 4. Extras
+      "com.lightbend"                 %% "emoji"                             % "1.2.2"
     ),
     run / fork := true,
     Global / cancelable := false, // ctrl-c
@@ -63,9 +62,18 @@ val `akka-cluster-playground` = project
     Test / parallelExecution := false,
     // show full stack traces and test case durations
     Test / testOptions += Tests.Argument("-oDF"),
-    Test / logBuffered := false,
-    licenses := Seq(
-      ("CC0", url("http://creativecommons.org/publicdomain/zero/1.0"))
-    )
+    Test / logBuffered := false
   )
   .configs(MultiJvm)
+val `distributed-data-service` = project
+  .in(file("distributed-data-service"))
+  .enablePlugins(JavaAppPackaging)
+  .dependsOn(`distributed-data-typed`)
+  .settings(
+    libraryDependencies ++= Seq(
+      "net.codingwell"       %% "scala-guice"        % "5.0.2",
+      "com.colofabrix.scala" %% "figlet4s-core"      % "0.3.1",
+      "io.kamon"             %% "kamon-bundle"       % "2.4.8",
+      "io.kamon"             %% "kamon-apm-reporter" % "2.4.8"
+    )
+  )

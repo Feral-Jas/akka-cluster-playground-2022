@@ -1,22 +1,41 @@
+package io.gdmexchange.ddata
+
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.AskPattern.{Askable, schedulerFromActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import io.gdmexchange.ddata.actor.ClusterScheduler
+import io.gdmexchange.ddata.module.UniversalModule
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
-import sample.gdmexchange.datamodel.DataItemBase
-import sample.gdmexchange.{ClusterScheduler, DistributedDataActor, UniversalModule}
+import sample.gdmexchange.DistributedDataActor
+import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
+
+import java.util.UUID
+import scala.util.Random
 
 /** @author Chenyu.Liu
   */
 class ApiDependencyWiring(implicit val injector: ScalaInjector) extends UniversalModule.GlobalImplicits {
-  private val distributedDataActor =
+  private val distributedDataActor                   =
     injector.instance[ActorRef[DistributedDataActor.Command[DataItemBase]]]
-  injector.instance[ActorRef[ClusterScheduler.Task]]
-  val externalApis: Route          = path("data") {
-    val dataSetFut =
-      distributedDataActor.ask(DistributedDataActor.GetAllData[DataItemBase])
-    onSuccess(dataSetFut) { dataSet =>
-      complete(dataSet.items.toString())
+  private val value: ActorRef[ClusterScheduler.Task] = injector.instance[ActorRef[ClusterScheduler.Task]]
+  val externalApis: Route                            = pathPrefix("data") {
+    get {
+      val dataSetFut =
+        distributedDataActor.ask(DistributedDataActor.GetAllData[DataItemBase])
+      onSuccess(dataSetFut) { dataSet =>
+        complete(dataSet.items.toString())
+      }
+    } ~ post {
+      distributedDataActor ! DistributedDataActor.AddData(
+        TypedDataItem(
+          "key" + Random.nextInt(100),
+          TypedDataItem.CACHE,
+          stringValueOpt = Some(UUID.randomUUID().toString),
+          Some(Random.nextInt(100))
+        )
+      )
+      complete("added")
     } ~ (path("remove") & delete) {
       parameter('name.as[String]) { dataName =>
         distributedDataActor ! DistributedDataActor.RemoveData[DataItemBase](

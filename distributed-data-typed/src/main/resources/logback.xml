@@ -2,7 +2,7 @@
 <configuration>
     <appender name="STDOUT" target="System.out" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%date{ISO8601}] [%X{akkaAddress}] %level - %msg%n</pattern>
+            <pattern>[%date{HH:mm:ss}] [%X{akkaAddress}] %msg%n</pattern>
         </encoder>
     </appender>
 

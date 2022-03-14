@@ -1,18 +1,22 @@
-package sample.gdmexchange
+package io.gdmexchange.ddata.module
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem, SupervisorStrategy}
 import akka.cluster.typed.{ClusterSingleton, SingletonActor}
 import akka.util.Timeout
 import com.google.inject.{AbstractModule, Provides, Singleton}
+import io.gdmexchange.ddata.actor.ClusterScheduler
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import net.codingwell.scalaguice.ScalaModule
 import sample.Loggable
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
+import sample.gdmexchange.DistributedDataActor
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
+/** @author Chenyu.Liu
+  */
 case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule with ScalaModule with Loggable {
   override def configure(): Unit =
     bind[ActorContext[_]].toInstance(actorContext)
@@ -27,13 +31,13 @@ case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule
 
   @Provides
   @Singleton
-  def distributedConfig: ActorRef[DistributedDataActor.Command[DataItemBase]] = {
+  def distributedDataActor(appName: String): ActorRef[DistributedDataActor.Command[DataItemBase]] = {
     val actorRef =
       actorContext.spawn(
-        DistributedDataActor.apply[TypedDataItem]("fp-api-server"),
-        "ddata"
+        DistributedDataActor.apply[TypedDataItem](appName),
+        "DistributedDataActor"
       )
-    logger.info("++++++++++|Actor::DistributedConfig spawned")
+    logger.info("++++++++++|Actor::DistributedDataActor spawned")
     actorRef
   }
 
@@ -59,12 +63,12 @@ case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule
   }
 }
 object UniversalModule {
-  trait GlobalImplicits        {
+  trait GlobalImplicits {
     implicit val injector: ScalaInjector
     implicit val timeout: Timeout                   = 5.seconds
     implicit val typedSystem: ActorSystem[_]        = injector.instance[ActorSystem[_]]
     implicit val executionContext: ExecutionContext =
       injector.instance[ExecutionContext]
   }
-  sealed trait ActorCollection {}
+  trait ActorCollection {}
 }
