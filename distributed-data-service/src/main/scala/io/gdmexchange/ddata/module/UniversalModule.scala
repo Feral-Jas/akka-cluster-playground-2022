@@ -63,12 +63,12 @@ case class UniversalModule(actorContext: ActorContext[_]) extends AbstractModule
   }
 }
 object UniversalModule {
-  trait GlobalImplicits        {
+  trait GlobalImplicits {
     implicit val injector: ScalaInjector
     implicit val timeout: Timeout                   = 5.seconds
     implicit val typedSystem: ActorSystem[_]        = injector.instance[ActorSystem[_]]
     implicit val executionContext: ExecutionContext =
       injector.instance[ExecutionContext]
   }
-  sealed trait ActorCollection {}
+  trait ActorCollection {}
 }

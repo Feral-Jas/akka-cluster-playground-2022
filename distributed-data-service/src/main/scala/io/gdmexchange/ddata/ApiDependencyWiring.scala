@@ -19,23 +19,23 @@ class ApiDependencyWiring(implicit val injector: ScalaInjector) extends Universa
   private val distributedDataActor                   =
     injector.instance[ActorRef[DistributedDataActor.Command[DataItemBase]]]
   private val value: ActorRef[ClusterScheduler.Task] = injector.instance[ActorRef[ClusterScheduler.Task]]
-  val externalApis: Route                            = path("data") {
+  val externalApis: Route                            = pathPrefix("data") {
     get {
       val dataSetFut =
         distributedDataActor.ask(DistributedDataActor.GetAllData[DataItemBase])
       onSuccess(dataSetFut) { dataSet =>
         complete(dataSet.items.toString())
-      } ~ post {
-        distributedDataActor ! DistributedDataActor.AddData(
-          TypedDataItem(
-            "key" + Random.nextInt(100),
-            TypedDataItem.CACHE,
-            stringValueOpt = Some(UUID.randomUUID().toString),
-            Some(Random.nextInt(100))
-          )
-        )
-        complete("added")
       }
+    } ~ post {
+      distributedDataActor ! DistributedDataActor.AddData(
+        TypedDataItem(
+          "key" + Random.nextInt(100),
+          TypedDataItem.CACHE,
+          stringValueOpt = Some(UUID.randomUUID().toString),
+          Some(Random.nextInt(100))
+        )
+      )
+      complete("added")
     } ~ (path("remove") & delete) {
       parameter('name.as[String]) { dataName =>
         distributedDataActor ! DistributedDataActor.RemoveData[DataItemBase](

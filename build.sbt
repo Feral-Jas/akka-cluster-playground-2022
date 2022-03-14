@@ -52,7 +52,9 @@ val `distributed-data-typed`   = project
       "com.lightbend.akka.discovery"  %% "akka-discovery-kubernetes-api"     % AkkaManagementVersion,
       "com.typesafe.akka"             %% "akka-discovery"                    % AkkaVersion,
       "ch.qos.logback"                 % "logback-classic"                   % "1.2.11",
-      "org.scalatest"                 %% "scalatest"                         % "3.2.11"    % Test
+      "org.scalatest"                 %% "scalatest"                         % "3.2.11"    % Test,
+      // 4. Extras
+      "com.lightbend"                 %% "emoji"                             % "1.2.2"
     ),
     run / fork := true,
     Global / cancelable := false, // ctrl-c
