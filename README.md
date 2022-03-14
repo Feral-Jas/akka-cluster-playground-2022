@@ -13,14 +13,15 @@
 
 1. sbt (go to sbt shell)
 2. multi-jvm:test
-3. multi-jvm:testOnly sample.distributeddata.DistributedConfigSpec
+3. multi-jvm:testOnly sample.distributeddata.DistributedDataSpec
 
 #### How to run
 
-1. define program args
-1. 3000/3001/3002 for http port
-
-3. have fun (currently there's nothing defined in cluster)
+> environment variables:
+1. HTTP_PORT=3000
+2. CANONICAL_PORT=2551(optional)
+3. MANAGE_PORT=9101(optional)
+4. have fun
 
 #### TODOs
 
