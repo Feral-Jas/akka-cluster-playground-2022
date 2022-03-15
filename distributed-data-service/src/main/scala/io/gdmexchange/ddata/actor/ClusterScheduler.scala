@@ -8,7 +8,10 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
+import com.lightbend.emoji.ShortCodes.Implicits.Emojilator
+import com.lightbend.emoji.ShortCodes.Defaults._
 import sample.gdmexchange.DistributedDataActor
+import sample.gdmexchange.DistributedDataActor.DataSet
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 import sample.{CborSerializable, Loggable}
 
@@ -38,29 +41,25 @@ object ClusterScheduler extends Loggable {
 //          logger.info("<<<< Reload config from database")
 //          doReloadConfigFromDb(distributedDataActor)
           //remove ask later
-          distributedDataActor
-            .ask(
-              DistributedDataActor.GetAllData[DataItemBase]
-            )
-            .onComplete {
-              case Failure(exception) =>
-                logger.error(exception.getMessage)
-                throw exception
-              case Success(dataSet)   =>
-                logger.info("===============DATA SUMMARY===============")
-                if (dataSet.items.isEmpty) {
-                  logger.info("empty set")
-                } else {
-                  logger.info(s"total size = ${dataSet.items.size}")
-                  logger.info(
-                    s"youngest record = ${dataSet.items.toList.minBy(_.createdAt.getSecond).toString}"
-                  )
-                  logger.info(
-                    s"oldest record = ${dataSet.items.toList.maxBy(_.createdAt.getSecond).toString}"
-                  )
-                }
-                logger.info("==========================================")
-            }
+          distributedDataActor.ask[DataSet[DataItemBase]](DistributedDataActor.GetAllData(_)).onComplete {
+            case Failure(exception) =>
+              logger.error(exception.getMessage)
+              throw exception
+            case Success(dataSet)   =>
+              logger.info(e"==============:hammer:DATA SUMMARY:hammer:==============")
+              if (dataSet.items.isEmpty) {
+                logger.info("empty set")
+              } else {
+                logger.info(s"total size = ${dataSet.items.size}")
+                logger.info(
+                  s"youngest record = ${dataSet.items.toList.minBy(_.createdAt.getSecond).toString}"
+                )
+                logger.info(
+                  s"oldest record = ${dataSet.items.toList.maxBy(_.createdAt.getSecond).toString}"
+                )
+              }
+              logger.info("==========================================")
+          }
           Behaviors.same
         case SimpleLoggerTask       =>
           Figlet4s

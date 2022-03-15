@@ -13,16 +13,20 @@ import scala.concurrent.duration.DurationInt
 
 object DistributedDataActor extends Loggable {
   sealed trait Command[T <: DataItemBase]
-  final case class GetAllData[T <: DataItemBase](replyTo: ActorRef[DataSet[T]]) extends Command[DataItemBase]
-  final case class AddData[T <: DataItemBase](dataItem: DataItemBase)           extends Command[DataItemBase]
-  final case class RemoveData[T <: DataItemBase](dataName: String)              extends Command[DataItemBase]
+  final case class GetAllData[T <: DataItemBase](
+      replyTo: ActorRef[DataSet[DataItemBase]],
+      filter: ((String, DataItemBase)) => Boolean = _ => true
+  )                                                                   extends Command[DataItemBase]
+  final case class AddData[T <: DataItemBase](dataItem: DataItemBase) extends Command[DataItemBase]
+  final case class RemoveData[T <: DataItemBase](dataName: String)    extends Command[DataItemBase]
 
   final case class DataSet[T <: DataItemBase](items: Set[T])
 
   private sealed trait InternalCommand[T <: DataItemBase] extends Command[T]
   private case class InternalGetResponse[T <: DataItemBase](
       replyTo: ActorRef[DataSet[DataItemBase]],
-      rsp: GetResponse[LWWMap[String, DataItemBase]]
+      rsp: GetResponse[LWWMap[String, DataItemBase]],
+      filter: ((String, DataItemBase)) => Boolean = _ => true
   )                                                       extends InternalCommand[DataItemBase]
   private case class InternalUpdateResponse[A <: ReplicatedData](
       rsp: UpdateResponse[A]
@@ -60,24 +64,24 @@ object DistributedDataActor extends Loggable {
           def receiveGetCart: PartialFunction[Command[DataItemBase], Behavior[
             Command[DataItemBase]
           ]] = {
-            case GetAllData(replyTo) =>
+            case GetAllData(replyTo, filter) =>
               replicator.askGet(
                 askReplyTo => Get(DataKey, readMajority, askReplyTo),
                 rsp => InternalGetResponse(replyTo, rsp)
               )
               Behaviors.same
 
-            case InternalGetResponse(replyTo, g @ GetSuccess(DataKey, _)) =>
+            case InternalGetResponse(replyTo, g @ GetSuccess(DataKey, _), filter) =>
               val data = g.get(DataKey)
-              val cart = DataSet(data.entries.values.toSet)
+              val cart = DataSet(data.entries.filter(filter).values.toSet)
               replyTo ! cart
               Behaviors.same
 
-            case InternalGetResponse(replyTo, NotFound(DataKey, _)) =>
+            case InternalGetResponse(replyTo, NotFound(DataKey, _), filter) =>
               replyTo ! DataSet(Set.empty)
               Behaviors.same
 
-            case InternalGetResponse(replyTo, GetFailure(DataKey, _)) =>
+            case InternalGetResponse(replyTo, GetFailure(DataKey, _), filter) =>
               // ReadMajority failure, try again with local read
               replicator.askGet(
                 askReplyTo => Get(DataKey, ReadLocal, askReplyTo),
