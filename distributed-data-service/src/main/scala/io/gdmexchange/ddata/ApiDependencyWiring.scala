@@ -8,6 +8,7 @@ import io.gdmexchange.ddata.actor.ClusterScheduler
 import io.gdmexchange.ddata.module.UniversalModule
 import net.codingwell.scalaguice.InjectorExtensions.ScalaInjector
 import sample.gdmexchange.DistributedDataActor
+import sample.gdmexchange.DistributedDataActor.DataSet
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
 
 import java.util.UUID
@@ -22,7 +23,7 @@ class ApiDependencyWiring(implicit val injector: ScalaInjector) extends Universa
   val externalApis: Route                            = pathPrefix("data") {
     get {
       val dataSetFut =
-        distributedDataActor.ask(DistributedDataActor.GetAllData[DataItemBase])
+        distributedDataActor.ask[DataSet[DataItemBase]](DistributedDataActor.GetAllData[DataItemBase](_))
       onSuccess(dataSetFut) { dataSet =>
         complete(dataSet.items.toString())
       }
@@ -45,7 +46,7 @@ class ApiDependencyWiring(implicit val injector: ScalaInjector) extends Universa
       }
     } ~ (path("clear") & delete) {
       val dataSetFut =
-        distributedDataActor.ask(DistributedDataActor.GetAllData[DataItemBase])
+        distributedDataActor.ask[DataSet[DataItemBase]](DistributedDataActor.GetAllData[DataItemBase](_))
       onSuccess(dataSetFut) { dataSet =>
         dataSet.items.foreach { dataItem =>
           distributedDataActor ! DistributedDataActor.RemoveData[DataItemBase](
