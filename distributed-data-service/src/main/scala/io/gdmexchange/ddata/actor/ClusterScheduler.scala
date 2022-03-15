@@ -8,8 +8,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.util.Timeout
 import com.colofabrix.scala.figlet4s.unsafe.{FIGureOps, Figlet4s, OptionsBuilderOps}
-import com.lightbend.emoji.ShortCodes.Implicits.Emojilator
 import com.lightbend.emoji.ShortCodes.Defaults._
+import com.lightbend.emoji.ShortCodes.Implicits.Emojilator
 import sample.gdmexchange.DistributedDataActor
 import sample.gdmexchange.DistributedDataActor.DataSet
 import sample.gdmexchange.datamodel.{DataItemBase, TypedDataItem}
